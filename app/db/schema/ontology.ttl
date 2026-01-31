@@ -1,0 +1,79 @@
+@prefix ex: <http://example.org/ontology/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+########################
+# Classes
+########################
+
+ex:Entity a rdfs:Class ;
+  rdfs:label "Entity"@en ;
+  rdfs:comment "Anything that can be referred to in the knowledge base."@en .
+
+ex:Event a rdfs:Class ;
+  rdfs:subClassOf ex:Entity ;
+  rdfs:label "Event"@en ;
+  rdfs:comment "Something that happens in time."@en .
+
+ex:War a rdfs:Class ;
+  rdfs:subClassOf ex:Event ;
+  rdfs:label "War"@en ;
+  rdfs:comment "An organized armed conflict between political entities."@en .
+
+ex:Battle a rdfs:Class ;
+  rdfs:subClassOf ex:Event ;
+  rdfs:label "Battle"@en ;
+  rdfs:comment "A military engagement during a war."@en .
+
+ex:Place a rdfs:Class ;
+  rdfs:subClassOf ex:Entity ;
+  rdfs:label "Place"@en .
+
+ex:Country a rdfs:Class ;
+  rdfs:subClassOf ex:Place ;
+  rdfs:label "Country"@en .
+
+########################
+# Properties
+########################
+
+ex:startDate a rdf:Property ;
+  rdfs:label "start date"@en ;
+  rdfs:domain ex:Event ;
+  rdfs:range xsd:date .
+
+ex:endDate a rdf:Property ;
+  rdfs:label "end date"@en ;
+  rdfs:domain ex:Event ;
+  rdfs:range xsd:date .
+
+ex:partOf a rdf:Property ;
+  rdfs:label "part of"@en ;
+  rdfs:domain ex:Event ;
+  rdfs:range ex:Event .
+
+ex:hasLocation a rdf:Property ;
+  rdfs:label "has location"@en ;
+  rdfs:domain ex:Event ;
+  rdfs:range ex:Place .
+
+ex:hasParticipant a rdf:Property ;
+  rdfs:label "has participant"@en ;
+  rdfs:domain ex:Event ;
+  rdfs:range ex:Entity ;
+  rdfs:comment "Entity (e.g. country, state) that participated in the event."@en .
+
+ex:latitude a rdf:Property ;
+  rdfs:label "latitude"@en ;
+  rdfs:domain ex:Entity ;
+  rdfs:range xsd:decimal ;
+  rdfs:comment "WGS84 latitude (e.g. from Wikidata P625) for mapping."@en .
+
+ex:longitude a rdf:Property ;
+  rdfs:label "longitude"@en ;
+  rdfs:domain ex:Entity ;
+  rdfs:range xsd:decimal ;
+  rdfs:comment "WGS84 longitude (e.g. from Wikidata P625) for mapping."@en .

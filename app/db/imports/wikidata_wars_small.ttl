@@ -1,0 +1,26 @@
+@prefix ex: <http://example.org/ontology/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+ex:wd_Q361 a ex:War ;
+  rdfs:label "World War I"@en ;
+  ex:startDate "1914-07-28"^^xsd:date ;
+  ex:endDate "1918-11-11"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q361> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q362 a ex:War ;
+  rdfs:label "World War II"@en ;
+  ex:startDate "1939-09-01"^^xsd:date ;
+  ex:endDate "1945-09-02"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q362> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q769 a ex:War ;
+  rdfs:label "Franco-Prussian War"@en ;
+  ex:startDate "1870-07-19"^^xsd:date ;
+  ex:endDate "1871-01-28"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q769> ;
+  dcterms:source <https://www.wikidata.org/> .

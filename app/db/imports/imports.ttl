@@ -1,0 +1,856 @@
+@prefix ex: <http://example.org/ontology/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+ex:wd_Q887803 a ex:Entity ;
+  rdfs:label "Bruneian Sultanate"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q887803> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q34266 a ex:Entity ;
+  rdfs:label "Russian Empire"@en ;
+  ex:latitude 58.65 ;
+  ex:longitude 70.1167 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q34266> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q189326 a ex:Entity ;
+  rdfs:label "Qajar dynasty"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q189326> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q298 a ex:Entity ;
+  rdfs:label "Chile"@en ;
+  ex:latitude -33 ;
+  ex:longitude -71 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q298> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q80702 a ex:Entity ;
+  rdfs:label "Spanish Empire"@en ;
+  ex:latitude 40.41666667 ;
+  ex:longitude -3.68333333 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q80702> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q178484 a ex:Entity ;
+  rdfs:label "Mapuche"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q178484> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q738144 a ex:Entity ;
+  rdfs:label "United Provinces of the Río de la Plata"@en ;
+  ex:latitude -34.666667 ;
+  ex:longitude -58.4 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q738144> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1816490 a ex:Entity ;
+  rdfs:label "liberals"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1816490> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2756861 a ex:Entity ;
+  rdfs:label "Miguelista"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2756861> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q419 a ex:Entity ;
+  rdfs:label "Peru"@en ;
+  ex:latitude -9.4 ;
+  ex:longitude -76 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q419> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q199821 a ex:Entity ;
+  rdfs:label "Gran Colombia"@en ;
+  ex:latitude 4.65 ;
+  ex:longitude -74.05 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q199821> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q3832218 a ex:Entity ;
+  rdfs:label "Unitarian League"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q3832218> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q3888700 a ex:Entity ;
+  rdfs:label "Federal pact"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q3888700> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q7161789 a ex:Entity ;
+  rdfs:label "pelucones/conservadores"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q7161789> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q9060031 a ex:Entity ;
+  rdfs:label "Pipiolos"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q9060031> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q12560 a ex:Entity ;
+  rdfs:label "Ottoman Empire"@en ;
+  ex:latitude 41 ;
+  ex:longitude 29 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q12560> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q165235 a ex:Entity ;
+  rdfs:label "Bosnians"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q165235> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q7141954 a ex:Entity ;
+  rdfs:label "Pashalik of Scutari"@en ;
+  ex:latitude 42.066666666667 ;
+  ex:longitude 19.5 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q7141954> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q142 a ex:Entity ;
+  rdfs:label "France"@en ;
+  ex:latitude 47 ;
+  ex:longitude 2 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q142> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q12480578 a ex:Entity ;
+  rdfs:label "Algerians"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q12480578> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q80866 a ex:Entity ;
+  rdfs:label "marabout"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q80866> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q760741 a ex:Entity ;
+  rdfs:label "Imamate of Futa Jallon"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q760741> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q786080 a ex:Entity ;
+  rdfs:label "Kombo"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q786080> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q862467 a ex:Entity ;
+  rdfs:label "Kingdom of Sine"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q862467> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q862478 a ex:Entity ;
+  rdfs:label "Kaabu"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q862478> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q892272 a ex:Entity ;
+  rdfs:label "Bundu"@en ;
+  ex:latitude 14.347762 ;
+  ex:longitude -12.470621 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q892272> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1471373 a ex:Entity ;
+  rdfs:label "Saloum"@en ;
+  ex:latitude 14.161389 ;
+  ex:longitude -16.030833 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1471373> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1661321 a ex:Entity ;
+  rdfs:label "Kingdom of Niumi"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1661321> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2594899 a ex:Entity ;
+  rdfs:label "Woolli"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2594899> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q124881664 a ex:Entity ;
+  rdfs:label "Kingdom of Niani"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q124881664> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q31 a ex:Entity ;
+  rdfs:label "Belgium"@en ;
+  ex:latitude 50.641111111111 ;
+  ex:longitude 4.6680555555556 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q31> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q15864 a ex:Entity ;
+  rdfs:label "United Kingdom of the Netherlands"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q15864> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q58202 a ex:Entity ;
+  rdfs:label "July Monarchy"@en ;
+  ex:latitude 48.816667 ;
+  ex:longitude 2.483333 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q58202> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q221457 a ex:Entity ;
+  rdfs:label "Congress Poland"@en ;
+  ex:latitude 52.233333 ;
+  ex:longitude 21.016667 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q221457> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q8680 a ex:Entity ;
+  rdfs:label "British Empire"@en ;
+  ex:latitude 51.507222 ;
+  ex:longitude -0.1275 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q8680> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q29057762 a ex:Entity ;
+  rdfs:label "Niumi"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q29057762> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1081620 a ex:Entity ;
+  rdfs:label "Siam"@en ;
+  ex:latitude 13.75 ;
+  ex:longitude 100.51666666667 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1081620> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q6500483 a ex:Entity ;
+  rdfs:label "Nguyen dynasty"@en ;
+  ex:latitude 16 ;
+  ex:longitude 108 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q6500483> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q5288818 a ex:Entity ;
+  rdfs:label "Dol Said"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q5288818> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q792 a ex:Entity ;
+  rdfs:label "El Salvador"@en ;
+  ex:latitude 13.668889 ;
+  ex:longitude -88.866111 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q792> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q190025 a ex:Entity ;
+  rdfs:label "Federal Republic of Central America"@en ;
+  ex:latitude 13.698888888889 ;
+  ex:longitude -89.191388888889 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q190025> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q30 a ex:Entity ;
+  rdfs:label "United States"@en ;
+  ex:latitude 39.828175 ;
+  ex:longitude -98.5795 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q30> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q107434 a ex:Entity ;
+  rdfs:label "Sioux"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q107434> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1065583 a ex:Entity ;
+  rdfs:label "Potawatomi"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1065583> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1537653 a ex:Entity ;
+  rdfs:label "Ho-Chunk"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1537653> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2447438 a ex:Entity ;
+  rdfs:label "Menominee"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2447438> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q4969552 a ex:Entity ;
+  rdfs:label "British Band"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q4969552> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q679189 a ex:Entity ;
+  rdfs:label "Carlism"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q679189> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q3816138 a ex:Entity ;
+  rdfs:label "liberalism and radicalism in Spain"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q3816138> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q117814596 a ex:Entity ;
+  rdfs:label "Carlist army"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q117814596> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1557298 a ex:Entity ;
+  rdfs:label "Soran Emirate"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1557298> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q12254018 a ex:Entity ;
+  rdfs:label "Liberal Army (First Carlist War)"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q12254018> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q12254019 a ex:Entity ;
+  rdfs:label "Carlist army (First Carlist War)"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q12254019> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1397 a ex:Entity ;
+  rdfs:label "Ohio"@en ;
+  ex:latitude 40.5 ;
+  ex:longitude -82.5 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1397> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1360064 a ex:Entity ;
+  rdfs:label "Michigan Territory"@en ;
+  ex:latitude 42.332777777778 ;
+  ex:longitude -83.049444444444 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1360064> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q750 a ex:Entity ;
+  rdfs:label "Bolivia"@en ;
+  ex:latitude -17.056869611111 ;
+  ex:longitude -64.991228611111 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q750> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q162192 a ex:Entity ;
+  rdfs:label "Riograndense Republic"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q162192> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q217230 a ex:Entity ;
+  rdfs:label "Empire of Brazil"@en ;
+  ex:latitude -22.905392 ;
+  ex:longitude -43.177128 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q217230> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q170588 a ex:Entity ;
+  rdfs:label "Republic of Texas"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q170588> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1315810 a ex:Entity ;
+  rdfs:label "Mexican Texas"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1315810> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q5062192 a ex:Entity ;
+  rdfs:label "Centralist Republic of Mexico"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q5062192> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q474202 a ex:Entity ;
+  rdfs:label "Seminole"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q474202> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q654766 a ex:Entity ;
+  rdfs:label "North Peru"@en ;
+  ex:latitude -12.046057 ;
+  ex:longitude -77.030534 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q654766> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q832554 a ex:Entity ;
+  rdfs:label "Argentine Confederation"@en ;
+  ex:latitude -31.732222222222 ;
+  ex:longitude -60.528611111111 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q832554> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q899706 a ex:Entity ;
+  rdfs:label "Peru–Bolivian Confederation"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q899706> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2997636 a ex:Entity ;
+  rdfs:label "Kenesary Khan"@en ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2997636> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q174193 a ex:Entity ;
+  rdfs:label "United Kingdom of Great Britain and Ireland"@en ;
+  ex:latitude 51.50722222222 ;
+  ex:longitude -0.1275 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q174193> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q27306 a ex:Entity ;
+  rdfs:label "Kingdom of Prussia"@en ;
+  ex:latitude 53 ;
+  ex:longitude 14 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q27306> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q131964 a ex:Entity ;
+  rdfs:label "Austrian Empire"@en ;
+  ex:latitude 48.2 ;
+  ex:longitude 16.35 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q131964> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q491507 a ex:Entity ;
+  rdfs:label "Egypt eyalet"@en ;
+  ex:latitude 30.05 ;
+  ex:longitude 31.2167 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q491507> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q3399982 a ex:Entity ;
+  rdfs:label "Kingdom of Spain"@en ;
+  ex:latitude 40.2 ;
+  ex:longitude -3.5 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q3399982> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q135797958 a ex:War ;
+  rdfs:label "Bruneian Civil War of 1826"@en ;
+  ex:startDate "1826-01-01"^^xsd:date ;
+  ex:endDate "1828-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q887803 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q135797958> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1420115 a ex:War ;
+  rdfs:label "Russo-Persian War of 1826–28"@en ;
+  ex:startDate "1826-07-31"^^xsd:date ;
+  ex:endDate "1828-02-22"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q34266 ;
+  ex:hasParticipant ex:wd_Q189326 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1420115> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q98233405 a ex:War ;
+  rdfs:label "Katamanso War"@en ;
+  ex:startDate "1826-08-07"^^xsd:date ;
+  ex:endDate "1826-08-07"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q98233405> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q17633452 a ex:War ;
+  rdfs:label "First Central American Civil War"@en ;
+  ex:startDate "1826-09-06"^^xsd:date ;
+  ex:endDate "1829-06-25"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q17633452> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1072889 a ex:War ;
+  rdfs:label "Chilean War of Independence"@en ;
+  ex:startDate "1827-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q298 ;
+  ex:hasParticipant ex:wd_Q80702 ;
+  ex:hasParticipant ex:wd_Q178484 ;
+  ex:hasParticipant ex:wd_Q738144 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1072889> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q3398213 a ex:War ;
+  rdfs:label "War of the Aggrieved"@en ;
+  ex:startDate "1827-03-01"^^xsd:date ;
+  ex:endDate "1827-09-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q3398213> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q4256410 a ex:War ;
+  rdfs:label "Winnebago War"@en ;
+  ex:startDate "1827-06-27"^^xsd:date ;
+  ex:endDate "1827-09-22"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q4256410> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q287942 a ex:War ;
+  rdfs:label "Ninth Russo-Turkish War"@en ;
+  ex:startDate "1828-01-01"^^xsd:date ;
+  ex:endDate "1829-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q287942> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1237867 a ex:War ;
+  rdfs:label "Liberal Wars"@en ;
+  ex:startDate "1828-01-01"^^xsd:date ;
+  ex:endDate "1834-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q1816490 ;
+  ex:hasParticipant ex:wd_Q2756861 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1237867> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1972316 a ex:War ;
+  rdfs:label "Gran Colombia–Peru War"@en ;
+  ex:startDate "1828-05-20"^^xsd:date ;
+  ex:endDate "1829-09-22"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q419 ;
+  ex:hasParticipant ex:wd_Q199821 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1972316> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q6123785 a ex:War ;
+  rdfs:label "Third Argentine Civil War"@en ;
+  ex:startDate "1828-12-01"^^xsd:date ;
+  ex:endDate "1831-11-04"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q3832218 ;
+  ex:hasParticipant ex:wd_Q3888700 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q6123785> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q5098735 a ex:War ;
+  rdfs:label "Chilean Civil War of 1829-1830"@en ;
+  ex:startDate "1829-01-01"^^xsd:date ;
+  ex:endDate "1830-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q7161789 ;
+  ex:hasParticipant ex:wd_Q9060031 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q5098735> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q137168312 a ex:War ;
+  rdfs:label "Third Scutari-Ottoman War"@en ;
+  ex:startDate "1829-09-14"^^xsd:date ;
+  ex:endDate "1831-11-10"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q12560 ;
+  ex:hasParticipant ex:wd_Q165235 ;
+  ex:hasParticipant ex:wd_Q7141954 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q137168312> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1373933 a ex:War ;
+  rdfs:label "Eumerella Wars"@en ;
+  ex:startDate "1830-01-01"^^xsd:date ;
+  ex:endDate "1860-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1373933> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q12203897 a ex:War ;
+  rdfs:label "Algerian popular resistance against French invasion"@en ;
+  ex:startDate "1830-01-01"^^xsd:date ;
+  ex:endDate "1962-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q142 ;
+  ex:hasParticipant ex:wd_Q12480578 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q12203897> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q90026836 a ex:War ;
+  rdfs:label "Mormon War"@en ;
+  ex:startDate "1830-01-01"^^xsd:date ;
+  ex:endDate "1869-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q90026836> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q130601874 a ex:War ;
+  rdfs:label "Soninke-Marabout Wars"@en ;
+  ex:startDate "1830-01-01"^^xsd:date ;
+  ex:endDate "1887-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q80866 ;
+  ex:hasParticipant ex:wd_Q760741 ;
+  ex:hasParticipant ex:wd_Q786080 ;
+  ex:hasParticipant ex:wd_Q862467 ;
+  ex:hasParticipant ex:wd_Q862478 ;
+  ex:hasParticipant ex:wd_Q892272 ;
+  ex:hasParticipant ex:wd_Q1471373 ;
+  ex:hasParticipant ex:wd_Q1661321 ;
+  ex:hasParticipant ex:wd_Q2594899 ;
+  ex:hasParticipant ex:wd_Q124881664 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q130601874> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q120801227 a ex:War ;
+  rdfs:label "Belgian–Dutch War"@en ;
+  ex:startDate "1830-08-25"^^xsd:date ;
+  ex:endDate "1833-11-18"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q31 ;
+  ex:hasParticipant ex:wd_Q15864 ;
+  ex:hasParticipant ex:wd_Q58202 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q120801227> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q462964 a ex:War ;
+  rdfs:label "November Uprising"@en ;
+  ex:startDate "1830-11-29"^^xsd:date ;
+  ex:endDate "1831-10-21"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q34266 ;
+  ex:hasParticipant ex:wd_Q221457 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q462964> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q16329711 a ex:War ;
+  rdfs:label "Movement of 1831"@en ;
+  ex:startDate "1831-01-01"^^xsd:date ;
+  ex:endDate "1831-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q16329711> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q56280276 a ex:War ;
+  rdfs:label "Barra War"@en ;
+  ex:startDate "1831-01-01"^^xsd:date ;
+  ex:endDate "1832-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q8680 ;
+  ex:hasParticipant ex:wd_Q29057762 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q56280276> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2584439 a ex:War ;
+  rdfs:label "First Egyptian-Ottoman War"@en ;
+  ex:startDate "1831-01-01"^^xsd:date ;
+  ex:endDate "1833-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2584439> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q3381219 a ex:War ;
+  rdfs:label "Siamese–Vietnamese War of 1831-1834"@en ;
+  ex:startDate "1831-01-01"^^xsd:date ;
+  ex:endDate "1834-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q1081620 ;
+  ex:hasParticipant ex:wd_Q6500483 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q3381219> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q22936451 a ex:War ;
+  rdfs:label "Naning War"@en ;
+  ex:startDate "1831-08-06"^^xsd:date ;
+  ex:endDate "1832-06-15"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q5288818 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q22936451> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q5392819 a ex:War ;
+  rdfs:label "Fourth Argentine Civil War"@en ;
+  ex:startDate "1832-01-01"^^xsd:date ;
+  ex:endDate "1838-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q5392819> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q115514014 a ex:War ;
+  rdfs:label "Cauca War"@en ;
+  ex:startDate "1832-01-31"^^xsd:date ;
+  ex:endDate "1832-12-08"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q115514014> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q123508153 a ex:War ;
+  rdfs:label "Salvadoran Campaign of 1832"@en ;
+  ex:startDate "1832-03-14"^^xsd:date ;
+  ex:endDate "1832-03-28"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q792 ;
+  ex:hasParticipant ex:wd_Q190025 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q123508153> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q879980 a ex:War ;
+  rdfs:label "Black Hawk War"@en ;
+  ex:startDate "1832-05-01"^^xsd:date ;
+  ex:endDate "1832-08-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q30 ;
+  ex:hasParticipant ex:wd_Q107434 ;
+  ex:hasParticipant ex:wd_Q1065583 ;
+  ex:hasParticipant ex:wd_Q1537653 ;
+  ex:hasParticipant ex:wd_Q2447438 ;
+  ex:hasParticipant ex:wd_Q4969552 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q879980> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1178424 a ex:War ;
+  rdfs:label "Carlist Wars"@en ;
+  ex:startDate "1833-01-01"^^xsd:date ;
+  ex:endDate "1876-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q679189 ;
+  ex:hasParticipant ex:wd_Q3816138 ;
+  ex:hasParticipant ex:wd_Q117814596 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1178424> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q131412563 a ex:War ;
+  rdfs:label "Ottoman-Soran War"@en ;
+  ex:startDate "1833-01-01"^^xsd:date ;
+  ex:endDate "1835-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q12560 ;
+  ex:hasParticipant ex:wd_Q1557298 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q131412563> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2341073 a ex:War ;
+  rdfs:label "First Carlist War"@en ;
+  ex:startDate "1833-10-02"^^xsd:date ;
+  ex:endDate "1840-07-06"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q679189 ;
+  ex:hasParticipant ex:wd_Q3816138 ;
+  ex:hasParticipant ex:wd_Q12254018 ;
+  ex:hasParticipant ex:wd_Q12254019 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2341073> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q20617481 a ex:War ;
+  rdfs:label "Sixth Xhosa War"@en ;
+  ex:startDate "1834-01-01"^^xsd:date ;
+  ex:endDate "1836-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q20617481> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q16473092 a ex:War ;
+  rdfs:label "Peruvian Civil War of 1834"@en ;
+  ex:startDate "1834-01-03"^^xsd:date ;
+  ex:endDate "1834-04-24"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q16473092> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q1369423 a ex:War ;
+  rdfs:label "Toledo War"@en ;
+  ex:startDate "1835-01-01"^^xsd:date ;
+  ex:endDate "1836-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q1397 ;
+  ex:hasParticipant ex:wd_Q1360064 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q1369423> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q5887865 a ex:War ;
+  rdfs:label "Salaverry-Santa Cruz War"@en ;
+  ex:startDate "1835-01-01"^^xsd:date ;
+  ex:endDate "1836-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q5887865> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q28131511 a ex:War ;
+  rdfs:label "Peruvian Pacification War"@en ;
+  ex:startDate "1835-01-01"^^xsd:date ;
+  ex:endDate "1836-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q419 ;
+  ex:hasParticipant ex:wd_Q750 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q28131511> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q209297 a ex:War ;
+  rdfs:label "Farroupilha Revolution"@en ;
+  ex:startDate "1835-09-20"^^xsd:date ;
+  ex:endDate "1845-03-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q162192 ;
+  ex:hasParticipant ex:wd_Q217230 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q209297> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q638530 a ex:War ;
+  rdfs:label "Texas Revolution"@en ;
+  ex:startDate "1835-10-02"^^xsd:date ;
+  ex:endDate "1864-04-21"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q170588 ;
+  ex:hasParticipant ex:wd_Q1315810 ;
+  ex:hasParticipant ex:wd_Q5062192 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q638530> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2976715 a ex:War ;
+  rdfs:label "Second Seminole War"@en ;
+  ex:startDate "1835-12-23"^^xsd:date ;
+  ex:endDate "1842-08-14"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q30 ;
+  ex:hasParticipant ex:wd_Q474202 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2976715> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q135410476 a ex:War ;
+  rdfs:label "Ottoman-Soran War"@en ;
+  ex:startDate "1836-01-01"^^xsd:date ;
+  ex:endDate "1838-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q12560 ;
+  ex:hasParticipant ex:wd_Q1557298 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q135410476> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q601811 a ex:War ;
+  rdfs:label "War of the Confederation"@en ;
+  ex:startDate "1836-12-28"^^xsd:date ;
+  ex:endDate "1839-08-15"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q298 ;
+  ex:hasParticipant ex:wd_Q654766 ;
+  ex:hasParticipant ex:wd_Q832554 ;
+  ex:hasParticipant ex:wd_Q899706 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q601811> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q4126350 a ex:War ;
+  rdfs:label "Kenesary Kasymov's uprising"@en ;
+  ex:startDate "1837-01-01"^^xsd:date ;
+  ex:endDate "1847-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q2997636 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q4126350> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q5317509 a ex:War ;
+  rdfs:label "Dutch–Ahanta War"@en ;
+  ex:startDate "1837-01-01"^^xsd:date ;
+  ex:endDate "1839-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q5317509> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q9001194 a ex:War ;
+  rdfs:label "Tarija War"@en ;
+  ex:startDate "1837-05-19"^^xsd:date ;
+  ex:endDate "1839-04-26"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q832554 ;
+  ex:hasParticipant ex:wd_Q899706 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q9001194> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q698312 a ex:War ;
+  rdfs:label "Aroostook War"@en ;
+  ex:startDate "1838-01-01"^^xsd:date ;
+  ex:endDate "1839-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q30 ;
+  ex:hasParticipant ex:wd_Q174193 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q698312> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q7148030 a ex:War ;
+  rdfs:label "Patriot War"@en ;
+  ex:startDate "1838-01-01"^^xsd:date ;
+  ex:endDate "1838-12-04"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q7148030> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q856168 a ex:War ;
+  rdfs:label "Pastry War"@en ;
+  ex:startDate "1838-11-27"^^xsd:date ;
+  ex:endDate "1839-03-09"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q30 ;
+  ex:hasParticipant ex:wd_Q58202 ;
+  ex:hasParticipant ex:wd_Q170588 ;
+  ex:hasParticipant ex:wd_Q174193 ;
+  ex:hasParticipant ex:wd_Q5062192 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q856168> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q2600326 a ex:War ;
+  rdfs:label "Second Egyptian-Ottoman War"@en ;
+  ex:startDate "1839-01-01"^^xsd:date ;
+  ex:endDate "1841-01-01"^^xsd:date ;
+  ex:hasParticipant ex:wd_Q12560 ;
+  ex:hasParticipant ex:wd_Q27306 ;
+  ex:hasParticipant ex:wd_Q34266 ;
+  ex:hasParticipant ex:wd_Q58202 ;
+  ex:hasParticipant ex:wd_Q131964 ;
+  ex:hasParticipant ex:wd_Q174193 ;
+  ex:hasParticipant ex:wd_Q491507 ;
+  ex:hasParticipant ex:wd_Q3399982 ;
+  owl:sameAs <http://www.wikidata.org/entity/Q2600326> ;
+  dcterms:source <https://www.wikidata.org/> .
+
+ex:wd_Q4122577 a ex:War ;
+  rdfs:label "Anti-Rent War"@en ;
+  ex:startDate "1839-01-01"^^xsd:date ;
+  ex:endDate "1845-01-01"^^xsd:date ;
+  owl:sameAs <http://www.wikidata.org/entity/Q4122577> ;
+  dcterms:source <https://www.wikidata.org/> .

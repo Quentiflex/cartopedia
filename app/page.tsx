@@ -1,65 +1,151 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { GanttChart } from "./components/GanttChart";
+import { Map } from "./components/Map";
+import { Timeline, type TimeWindow } from "./components/Timeline";
+import { WarParticipationPanel } from "./components/WarParticipationPanel";
+import type { War } from "./types/wars";
+import type { WarParticipation } from "./types/wars";
+
+const INITIAL_WINDOW: TimeWindow = { start: 1826, end: 1830 };
+
+type ViewMode = "map" | "gantt";
 
 export default function Home() {
+  const [viewMode, setViewMode] = useState<ViewMode>("map");
+  const [timeWindow, setTimeWindow] = useState<TimeWindow>(INITIAL_WINDOW);
+  const [participations, setParticipations] = useState<WarParticipation[]>([]);
+  const [wars, setWars] = useState<War[]>([]);
+  const [warsLoading, setWarsLoading] = useState(false);
+  const [selectedParticipation, setSelectedParticipation] =
+    useState<WarParticipation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchParticipations = useCallback(async (start: number, end: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/war-participants?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+      const data: WarParticipation[] = await res.json();
+      setParticipations(data);
+    } catch (e) {
+      setParticipations([]);
+      setError(e instanceof Error ? e.message : "Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchWars = useCallback(async (start: number, end: number) => {
+    setWarsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/wars?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+      const data: War[] = await res.json();
+      setWars(data);
+    } catch (e) {
+      setWars([]);
+      setError(e instanceof Error ? e.message : "Failed to load wars");
+    } finally {
+      setWarsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchParticipations(timeWindow.start, timeWindow.end);
+  }, [timeWindow.start, timeWindow.end, fetchParticipations]);
+
+  useEffect(() => {
+    if (viewMode === "gantt") {
+      fetchWars(timeWindow.start, timeWindow.end);
+    }
+  }, [viewMode, timeWindow.start, timeWindow.end, fetchWars]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="relative h-screen w-full overflow-hidden bg-zinc-900">
+      {viewMode === "map" ? (
+        <Map
+          participations={participations}
+          onParticipationClick={setSelectedParticipation}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+      ) : (
+        <div className="absolute inset-0 flex flex-col pt-20 pb-6">
+          {warsLoading && wars.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center text-zinc-400">
+              Loading wars…
+            </div>
+          ) : (
+            <GanttChart wars={wars} />
+          )}
+        </div>
+      )}
+      {selectedParticipation && (
+        <WarParticipationPanel
+          participation={selectedParticipation}
+          onClose={() => setSelectedParticipation(null)}
+        />
+      )}
+      <header className="absolute left-0 top-0 z-20 flex flex-wrap items-start gap-4 p-6">
+        <div className="pointer-events-none">
+          <h1 className="text-xl font-semibold tracking-tight text-white/95 drop-shadow-sm">
+            Cartopedia
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-0.5 text-sm text-white/70">
+            Wars and participants by time window (RDF)
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <div className="flex rounded-lg border border-zinc-600 bg-zinc-800/90 p-0.5">
+          <button
+            type="button"
+            onClick={() => setViewMode("map")}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+              viewMode === "map"
+                ? "bg-amber-500/90 text-zinc-900"
+                : "text-zinc-300 hover:bg-zinc-700 hover:text-white"
+            }`}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Map
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("gantt")}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+              viewMode === "gantt"
+                ? "bg-amber-500/90 text-zinc-900"
+                : "text-zinc-300 hover:bg-zinc-700 hover:text-white"
+            }`}
           >
-            Documentation
-          </a>
+            Gantt
+          </button>
         </div>
-      </main>
+        {error && (
+          <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+            {error}
+          </div>
+        )}
+        {loading && viewMode === "map" && participations.length === 0 && (
+          <div className="rounded-lg border border-zinc-600 bg-zinc-800/90 px-3 py-2 text-sm text-zinc-400">
+            Loading…
+          </div>
+        )}
+      </header>
+      <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-6">
+        <Timeline window={timeWindow} onWindowChange={setTimeWindow} />
+      </div>
     </div>
   );
 }

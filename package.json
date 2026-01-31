@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "scripts:fetch-wikidata": "node scripts/1-fetch-wikidata-wars.js",
+    "scripts:upload-fuseki": "node scripts/2-upload-to-fuseki.js",
+    "scripts:verify-fuseki": "node scripts/3-verify-fuseki.js"
   },
   "dependencies": {
+    "maplibre-gl": "^5.17.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
