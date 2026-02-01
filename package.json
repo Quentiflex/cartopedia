@@ -7,13 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "scripts:fetch-wikidata": "node scripts/1-fetch-wikidata-wars.js",
-    "scripts:upload-fuseki": "node scripts/2-upload-to-fuseki.js",
-    "scripts:verify-fuseki": "node scripts/3-verify-fuseki.js"
+    "scripts:ingest": "node scripts/1-ingest-wikidata.js",
+    "scripts:transform": "node scripts/2-transform-to-ontology.js",
+    "scripts:upload-fuseki": "node scripts/3-upload-to-fuseki.js",
+    "scripts:verify-fuseki": "node scripts/4-verify-fuseki.js"
   },
   "dependencies": {
+    "@protomaps/basemaps": "^5.7.0",
     "maplibre-gl": "^5.17.0",
+    "n3": "^2.0.1",
     "next": "16.1.6",
+    "pmtiles": "^4.3.2",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

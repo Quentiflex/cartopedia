@@ -1,0 +1,681 @@
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix wdt: <http://www.wikidata.org/prop/direct/> .
+@prefix p: <http://www.wikidata.org/prop/> .
+@prefix ps: <http://www.wikidata.org/prop/statement/> .
+@prefix psv: <http://www.wikidata.org/prop/statement/value/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix wikibase: <http://wikiba.se/ontology#> .
+
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix wdt: <http://www.wikidata.org/prop/direct/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix bd: <http://www.bigdata.com/rdf#> .
+@prefix wikibase: <http://wikiba.se/ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix hint: <http://www.bigdata.com/queryHints#> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix psn: <http://www.wikidata.org/prop/statement/value-normalized/> .
+@prefix pqn: <http://www.wikidata.org/prop/qualifier/value-normalized/> .
+@prefix prn: <http://www.wikidata.org/prop/reference/value-normalized/> .
+@prefix mwapi: <https://www.mediawiki.org/ontology#API/> .
+@prefix gas: <http://www.bigdata.com/rdf/gas#> .
+@prefix wdsubgraph: <https://query.wikidata.org/subgraph/> .
+@prefix wdtn: <http://www.wikidata.org/prop/direct-normalized/> .
+@prefix psv: <http://www.wikidata.org/prop/statement/value/> .
+@prefix ps: <http://www.wikidata.org/prop/statement/> .
+@prefix pqv: <http://www.wikidata.org/prop/qualifier/value/> .
+@prefix pq: <http://www.wikidata.org/prop/qualifier/> .
+@prefix prv: <http://www.wikidata.org/prop/reference/value/> .
+@prefix pr: <http://www.wikidata.org/prop/reference/> .
+@prefix wdno: <http://www.wikidata.org/prop/novalue/> .
+@prefix p: <http://www.wikidata.org/prop/> .
+@prefix wdata: <http://www.wikidata.org/wiki/Special:EntityData/> .
+@prefix wds: <http://www.wikidata.org/entity/statement/> .
+@prefix wdv: <http://www.wikidata.org/value/> .
+@prefix wdref: <http://www.wikidata.org/reference/> .
+@prefix schema: <http://schema.org/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix geof: <http://www.opengis.net/def/geosparql/function/> .
+@prefix mediawiki: <https://www.mediawiki.org/ontology#> .
+@prefix ontolex: <http://www.w3.org/ns/lemon/ontolex#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix wikibaseqs: <http://wikiba.se/queryService#> .
+
+wd:Q120801227 wdt:P31 wd:Q198 ;
+	wdt:P580 "1830-08-25T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Belgian–Dutch War"@en ;
+	wdt:P710 wd:Q15864 .
+
+wd:Q15864 rdfs:label "United Kingdom of the Netherlands"@en .
+
+wd:Q2600326 wdt:P31 wd:Q198 ;
+	wdt:P580 "1839-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Second Egyptian-Ottoman War"@en ;
+	wdt:P710 wd:Q174193 .
+
+wd:Q174193 rdfs:label "United Kingdom of Great Britain and Ireland"@en .
+
+wd:Q2600326 wdt:P710 wd:Q3399982 .
+
+wd:Q3399982 rdfs:label "Kingdom of Spain"@en .
+
+wd:Q4122577 wdt:P31 wd:Q198 ;
+	wdt:P580 "1839-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Anti-Rent War"@en .
+
+wd:Q12203897 wdt:P31 wd:Q198 ;
+	wdt:P580 "1830-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Algerian popular resistance against French invasion"@en ;
+	wdt:P710 wd:Q142 .
+
+wd:Q142 rdfs:label "France"@en .
+
+wd:Q1972316 wdt:P31 wd:Q198 ;
+	wdt:P580 "1828-05-20T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Gran Colombia–Peru War"@en ;
+	wdt:P710 wd:Q419 .
+
+wd:Q419 rdfs:label "Peru"@en .
+
+wd:Q98233405 wdt:P31 wd:Q198 ;
+	wdt:P580 "1826-08-07T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Katamanso War"@en .
+
+wd:Q2600326 wdt:P710 wd:Q131964 .
+
+wd:Q131964 rdfs:label "Austrian Empire"@en .
+
+wd:Q1420115 wdt:P31 wd:Q198 ;
+	wdt:P580 "1826-07-31T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Russo-Persian War of 1826–28"@en ;
+	wdt:P710 wd:Q189326 .
+
+wd:Q189326 rdfs:label "Qajar dynasty"@en .
+
+wd:Q1072889 wdt:P31 wd:Q198 ;
+	wdt:P580 "1827-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Chilean War of Independence"@en ;
+	wdt:P710 wd:Q298 .
+
+wd:Q298 rdfs:label "Chile"@en .
+
+wd:Q120801227 wdt:P710 wd:Q58202 .
+
+wd:Q58202 rdfs:label "July Monarchy"@en .
+
+wd:Q137168312 wdt:P31 wd:Q198 ;
+	wdt:P580 "1829-09-14T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Third Scutari-Ottoman War"@en ;
+	wdt:P710 wd:Q12560 .
+
+wd:Q12560 rdfs:label "Ottoman Empire"@en .
+
+wd:Q90026836 wdt:P31 wd:Q198 ;
+	wdt:P580 "1830-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Mormon War"@en .
+
+wd:Q462964 wdt:P31 wd:Q198 ;
+	wdt:P580 "1830-11-29T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "November Uprising"@en ;
+	wdt:P710 wd:Q221457 .
+
+wd:Q221457 rdfs:label "Congress Poland"@en .
+
+wd:Q3381219 wdt:P31 wd:Q198 ;
+	wdt:P580 "1831-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Siamese–Vietnamese War of 1831-1834"@en ;
+	wdt:P710 wd:Q6500483 .
+
+wd:Q6500483 rdfs:label "Nguyen dynasty"@en .
+
+wd:Q1373933 wdt:P31 wd:Q198 ;
+	wdt:P580 "1830-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Eumerella Wars"@en .
+
+wd:Q2600326 wdt:P710 wd:Q491507 .
+
+wd:Q491507 rdfs:label "Egypt eyalet"@en .
+
+wd:Q2584439 wdt:P31 wd:Q198 ;
+	wdt:P580 "1831-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "First Egyptian-Ottoman War"@en .
+
+wd:Q16329711 wdt:P31 wd:Q198 ;
+	wdt:P580 "1831-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Movement of 1831"@en .
+
+wd:Q1237867 wdt:P31 wd:Q198 ;
+	wdt:P580 "1828-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Liberal Wars"@en ;
+	wdt:P710 wd:Q1816490 .
+
+wd:Q1816490 rdfs:label "liberals"@en .
+
+wd:Q3398213 wdt:P31 wd:Q198 ;
+	wdt:P580 "1827-03-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "War of the Aggrieved"@en .
+
+wd:Q1420115 wdt:P710 wd:Q34266 .
+
+wd:Q34266 rdfs:label "Russian Empire"@en .
+
+wd:Q5098735 wdt:P31 wd:Q198 ;
+	wdt:P580 "1829-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Chilean Civil War of 1829-1830"@en ;
+	wdt:P710 wd:Q7161789 .
+
+wd:Q7161789 rdfs:label "pelucones/conservadores"@en .
+
+wd:Q137168312 wdt:P710 wd:Q165235 .
+
+wd:Q165235 rdfs:label "Bosnians"@en .
+
+wd:Q130601874 wdt:P31 wd:Q198 ;
+	wdt:P580 "1830-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Soninke-Marabout Wars"@en ;
+	wdt:P710 wd:Q80866 .
+
+wd:Q80866 rdfs:label "marabout"@en .
+
+wd:Q2600326 wdt:P710 wd:Q34266 .
+
+wd:Q130601874 wdt:P710 wd:Q124881664 .
+
+wd:Q124881664 rdfs:label "Kingdom of Niani"@en .
+
+wd:Q130601874 wdt:P710 wd:Q892272 .
+
+wd:Q892272 rdfs:label "Bundu"@en .
+
+wd:Q2600326 wdt:P710 wd:Q12560 .
+
+wd:Q56280276 wdt:P31 wd:Q198 ;
+	wdt:P580 "1831-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Barra War"@en ;
+	wdt:P710 wd:Q29057762 .
+
+wd:Q29057762 rdfs:label "Niumi"@en .
+
+wd:Q130601874 wdt:P710 wd:Q1471373 .
+
+wd:Q1471373 rdfs:label "Saloum"@en .
+
+wd:Q462964 wdt:P710 wd:Q34266 .
+
+wd:Q287942 wdt:P31 wd:Q198 ;
+	wdt:P580 "1828-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Ninth Russo-Turkish War"@en .
+
+wd:Q12203897 wdt:P710 wd:Q12480578 .
+
+wd:Q12480578 rdfs:label "Algerians"@en .
+
+wd:Q5098735 wdt:P710 wd:Q9060031 .
+
+wd:Q9060031 rdfs:label "Pipiolos"@en .
+
+wd:Q1972316 wdt:P710 wd:Q199821 .
+
+wd:Q199821 rdfs:label "Gran Colombia"@en .
+
+wd:Q1072889 wdt:P710 wd:Q80702 .
+
+wd:Q80702 rdfs:label "Spanish Empire"@en .
+
+wd:Q130601874 wdt:P710 wd:Q786080 .
+
+wd:Q786080 rdfs:label "Kombo"@en .
+
+wd:Q2600326 wdt:P710 wd:Q27306 .
+
+wd:Q27306 rdfs:label "Kingdom of Prussia"@en .
+
+wd:Q4256410 wdt:P31 wd:Q198 ;
+	wdt:P580 "1827-06-27T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Winnebago War"@en .
+
+wd:Q130601874 wdt:P710 wd:Q1661321 .
+
+wd:Q1661321 rdfs:label "Kingdom of Niumi"@en .
+
+wd:Q1237867 wdt:P710 wd:Q2756861 .
+
+wd:Q2756861 rdfs:label "Miguelista"@en .
+
+wd:Q1072889 wdt:P710 wd:Q178484 .
+
+wd:Q178484 rdfs:label "Mapuche"@en .
+
+wd:Q17633452 wdt:P31 wd:Q198 ;
+	wdt:P580 "1826-09-06T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "First Central American Civil War"@en .
+
+wd:Q2600326 wdt:P710 wd:Q58202 .
+
+wd:Q130601874 wdt:P710 wd:Q2594899 .
+
+wd:Q2594899 rdfs:label "Woolli"@en .
+
+wd:Q22936451 wdt:P31 wd:Q198 ;
+	wdt:P580 "1831-08-06T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Naning War"@en ;
+	wdt:P710 wd:Q5288818 .
+
+wd:Q5288818 rdfs:label "Dol Said"@en .
+
+wd:Q56280276 wdt:P710 wd:Q8680 .
+
+wd:Q8680 rdfs:label "British Empire"@en .
+
+wd:Q120801227 wdt:P710 wd:Q31 .
+
+wd:Q31 rdfs:label "Belgium"@en .
+
+wd:Q3381219 wdt:P710 wd:Q1081620 .
+
+wd:Q1081620 rdfs:label "Siam"@en .
+
+wd:Q6123785 wdt:P31 wd:Q198 ;
+	wdt:P580 "1828-12-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Third Argentine Civil War"@en ;
+	wdt:P710 wd:Q3832218 .
+
+wd:Q3832218 rdfs:label "Unitarian League"@en .
+
+wd:Q6123785 wdt:P710 wd:Q3888700 .
+
+wd:Q3888700 rdfs:label "Federal pact"@en .
+
+wd:Q130601874 wdt:P710 wd:Q760741 .
+
+wd:Q760741 rdfs:label "Imamate of Futa Jallon"@en .
+
+wd:Q5392819 wdt:P31 wd:Q198 ;
+	wdt:P580 "1832-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Fourth Argentine Civil War"@en .
+
+wd:Q137168312 wdt:P710 wd:Q7141954 .
+
+wd:Q7141954 rdfs:label "Pashalik of Scutari"@en .
+
+wd:Q130601874 wdt:P710 wd:Q862467 .
+
+wd:Q862467 rdfs:label "Kingdom of Sine"@en .
+
+wd:Q130601874 wdt:P710 wd:Q862478 .
+
+wd:Q862478 rdfs:label "Kaabu"@en .
+
+wd:Q135797958 wdt:P31 wd:Q198 ;
+	wdt:P580 "1826-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Bruneian Civil War of 1826"@en ;
+	wdt:P710 wd:Q887803 .
+
+wd:Q887803 rdfs:label "Bruneian Sultanate"@en .
+
+wd:Q1072889 wdt:P710 wd:Q738144 .
+
+wd:Q738144 rdfs:label "United Provinces of the Río de la Plata"@en .
+
+wd:Q879980 wdt:P31 wd:Q198 ;
+	wdt:P580 "1832-05-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Black Hawk War"@en ;
+	wdt:P710 wd:Q107434 .
+
+wd:Q107434 rdfs:label "Sioux"@en .
+
+wd:Q879980 wdt:P710 wd:Q1065583 .
+
+wd:Q1065583 rdfs:label "Potawatomi"@en .
+
+wd:Q1369423 wdt:P31 wd:Q198 ;
+	wdt:P580 "1835-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Toledo War"@en ;
+	wdt:P710 wd:Q1397 .
+
+wd:Q1397 rdfs:label "Ohio"@en .
+
+wd:Q2976715 wdt:P31 wd:Q198 ;
+	wdt:P580 "1835-12-23T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Second Seminole War"@en ;
+	wdt:P710 wd:Q30 .
+
+wd:Q30 rdfs:label "United States"@en .
+
+wd:Q879980 wdt:P710 wd:Q4969552 .
+
+wd:Q4969552 rdfs:label "British Band"@en .
+
+wd:Q856168 wdt:P31 wd:Q198 ;
+	wdt:P580 "1838-11-27T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Pastry War"@en ;
+	wdt:P710 wd:Q30 .
+
+wd:Q879980 wdt:P710 wd:Q2447438 .
+
+wd:Q2447438 rdfs:label "Menominee"@en .
+
+wd:Q879980 wdt:P710 wd:Q1537653 .
+
+wd:Q1537653 rdfs:label "Ho-Chunk"@en .
+
+wd:Q638530 wdt:P31 wd:Q198 ;
+	wdt:P580 "1835-10-02T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Texas Revolution"@en ;
+	wdt:P710 wd:Q1315810 .
+
+wd:Q1315810 rdfs:label "Mexican Texas"@en .
+
+wd:Q135410476 wdt:P31 wd:Q198 ;
+	wdt:P580 "1836-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Ottoman-Soran War"@en ;
+	wdt:P710 wd:Q12560 .
+
+wd:Q638530 wdt:P710 wd:Q170588 .
+
+wd:Q170588 rdfs:label "Republic of Texas"@en .
+
+wd:Q1178424 wdt:P31 wd:Q198 ;
+	wdt:P580 "1833-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Carlist Wars"@en ;
+	wdt:P710 wd:Q3816138 .
+
+wd:Q3816138 rdfs:label "liberalism and radicalism in Spain"@en .
+
+wd:Q1178424 wdt:P710 wd:Q679189 .
+
+wd:Q679189 rdfs:label "Carlism"@en .
+
+wd:Q698312 wdt:P31 wd:Q198 ;
+	wdt:P580 "1838-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Aroostook War"@en ;
+	wdt:P710 wd:Q174193 .
+
+wd:Q131412563 wdt:P31 wd:Q198 ;
+	wdt:P580 "1833-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Ottoman-Soran War"@en ;
+	wdt:P710 wd:Q1557298 .
+
+wd:Q1557298 rdfs:label "Soran Emirate"@en .
+
+wd:Q638530 wdt:P710 wd:Q5062192 .
+
+wd:Q5062192 rdfs:label "Centralist Republic of Mexico"@en .
+
+wd:Q115514014 wdt:P31 wd:Q198 ;
+	wdt:P580 "1832-01-31T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Cauca War"@en .
+
+wd:Q5887865 wdt:P31 wd:Q198 ;
+	wdt:P580 "1835-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Salaverry-Santa Cruz War"@en .
+
+wd:Q2341073 wdt:P31 wd:Q198 ;
+	wdt:P580 "1833-10-02T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "First Carlist War"@en ;
+	wdt:P710 wd:Q12254019 .
+
+wd:Q12254019 rdfs:label "Carlist army (First Carlist War)"@en .
+
+wd:Q2341073 wdt:P710 wd:Q12254018 .
+
+wd:Q12254018 rdfs:label "Liberal Army (First Carlist War)"@en .
+
+wd:Q123508153 wdt:P31 wd:Q198 ;
+	wdt:P580 "1832-03-14T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Salvadoran Campaign of 1832"@en ;
+	wdt:P710 wd:Q190025 .
+
+wd:Q190025 rdfs:label "Federal Republic of Central America"@en .
+
+wd:Q856168 wdt:P710 wd:Q58202 .
+
+wd:Q879980 wdt:P710 wd:Q30 .
+
+wd:Q601811 wdt:P31 wd:Q198 ;
+	wdt:P580 "1836-12-28T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "War of the Confederation"@en ;
+	wdt:P710 wd:Q654766 .
+
+wd:Q654766 rdfs:label "North Peru"@en .
+
+wd:Q2341073 wdt:P710 wd:Q3816138 .
+
+wd:Q4126350 wdt:P31 wd:Q198 ;
+	wdt:P580 "1837-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Kenesary Kasymov's uprising"@en ;
+	wdt:P710 wd:Q2997636 .
+
+wd:Q2997636 rdfs:label "Kenesary Khan"@en .
+
+wd:Q2341073 wdt:P710 wd:Q679189 .
+
+wd:Q2976715 wdt:P710 wd:Q474202 .
+
+wd:Q474202 rdfs:label "Seminole"@en .
+
+wd:Q209297 wdt:P31 wd:Q198 ;
+	wdt:P580 "1835-09-20T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Farroupilha Revolution"@en ;
+	wdt:P710 wd:Q162192 .
+
+wd:Q162192 rdfs:label "Riograndense Republic"@en .
+
+wd:Q601811 wdt:P710 wd:Q832554 .
+
+wd:Q832554 rdfs:label "Argentine Confederation"@en .
+
+wd:Q856168 wdt:P710 wd:Q174193 .
+
+wd:Q1369423 wdt:P710 wd:Q1360064 .
+
+wd:Q1360064 rdfs:label "Michigan Territory"@en .
+
+wd:Q209297 wdt:P710 wd:Q217230 .
+
+wd:Q217230 rdfs:label "Empire of Brazil"@en .
+
+wd:Q601811 wdt:P710 wd:Q899706 .
+
+wd:Q899706 rdfs:label "Peru–Bolivian Confederation"@en .
+
+wd:Q135410476 wdt:P710 wd:Q1557298 .
+
+wd:Q698312 wdt:P710 wd:Q30 .
+
+wd:Q7148030 wdt:P31 wd:Q198 ;
+	wdt:P580 "1838-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Patriot War"@en .
+
+wd:Q131412563 wdt:P710 wd:Q12560 .
+
+wd:Q123508153 wdt:P710 wd:Q792 .
+
+wd:Q792 rdfs:label "El Salvador"@en .
+
+wd:Q9001194 wdt:P31 wd:Q198 ;
+	wdt:P580 "1837-05-19T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Tarija War"@en ;
+	wdt:P710 wd:Q832554 .
+
+wd:Q20617481 wdt:P31 wd:Q198 ;
+	wdt:P580 "1834-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Sixth Xhosa War"@en .
+
+wd:Q5317509 wdt:P31 wd:Q198 ;
+	wdt:P580 "1837-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Dutch–Ahanta War"@en .
+
+wd:Q601811 wdt:P710 wd:Q298 .
+
+wd:Q28131511 wdt:P31 wd:Q198 ;
+	wdt:P580 "1835-01-01T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Peruvian Pacification War"@en ;
+	wdt:P710 wd:Q750 .
+
+wd:Q750 rdfs:label "Bolivia"@en .
+
+wd:Q856168 wdt:P710 wd:Q170588 .
+
+wd:Q28131511 wdt:P710 wd:Q419 .
+
+wd:Q9001194 wdt:P710 wd:Q899706 .
+
+wd:Q16473092 wdt:P31 wd:Q198 ;
+	wdt:P580 "1834-01-03T00:00:00Z"^^xsd:dateTime ;
+	rdfs:label "Peruvian Civil War of 1834"@en .
+
+wd:Q1178424 wdt:P710 wd:Q117814596 .
+
+wd:Q117814596 rdfs:label "Carlist army"@en .
+
+wd:Q856168 wdt:P710 wd:Q5062192 .
+
+
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix wdt: <http://www.wikidata.org/prop/direct/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix hint: <http://www.bigdata.com/queryHints#> .
+@prefix bd: <http://www.bigdata.com/rdf#> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix psn: <http://www.wikidata.org/prop/statement/value-normalized/> .
+@prefix pqn: <http://www.wikidata.org/prop/qualifier/value-normalized/> .
+@prefix prn: <http://www.wikidata.org/prop/reference/value-normalized/> .
+@prefix mwapi: <https://www.mediawiki.org/ontology#API/> .
+@prefix gas: <http://www.bigdata.com/rdf/gas#> .
+@prefix wdsubgraph: <https://query.wikidata.org/subgraph/> .
+@prefix wdtn: <http://www.wikidata.org/prop/direct-normalized/> .
+@prefix psv: <http://www.wikidata.org/prop/statement/value/> .
+@prefix ps: <http://www.wikidata.org/prop/statement/> .
+@prefix pqv: <http://www.wikidata.org/prop/qualifier/value/> .
+@prefix pq: <http://www.wikidata.org/prop/qualifier/> .
+@prefix prv: <http://www.wikidata.org/prop/reference/value/> .
+@prefix pr: <http://www.wikidata.org/prop/reference/> .
+@prefix wdno: <http://www.wikidata.org/prop/novalue/> .
+@prefix p: <http://www.wikidata.org/prop/> .
+@prefix wikibase: <http://wikiba.se/ontology#> .
+@prefix wdata: <http://www.wikidata.org/wiki/Special:EntityData/> .
+@prefix wds: <http://www.wikidata.org/entity/statement/> .
+@prefix wdv: <http://www.wikidata.org/value/> .
+@prefix wdref: <http://www.wikidata.org/reference/> .
+@prefix schema: <http://schema.org/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix geof: <http://www.opengis.net/def/geosparql/function/> .
+@prefix mediawiki: <https://www.mediawiki.org/ontology#> .
+@prefix ontolex: <http://www.w3.org/ns/lemon/ontolex#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix wikibaseqs: <http://wikiba.se/queryService#> .
+
+wd:Q98233405 wdt:P582 "1826-08-07T00:00:00Z"^^xsd:dateTime .
+
+wd:Q135797958 wdt:P582 "1828-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q1420115 wdt:P582 "1828-02-22T00:00:00Z"^^xsd:dateTime .
+
+wd:Q3398213 wdt:P582 "1827-09-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q4256410 wdt:P582 "1827-09-22T00:00:00Z"^^xsd:dateTime .
+
+wd:Q287942 wdt:P582 "1829-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q1972316 wdt:P582 "1829-09-22T00:00:00Z"^^xsd:dateTime .
+
+wd:Q5098735 wdt:P582 "1830-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q17633452 wdt:P582 "1829-06-25T00:00:00Z"^^xsd:dateTime .
+
+wd:Q137168312 wdt:P582 "1831-11-10T00:00:00Z"^^xsd:dateTime .
+
+wd:Q462964 wdt:P582 "1831-10-21T00:00:00Z"^^xsd:dateTime .
+
+wd:Q6123785 wdt:P582 "1831-11-04T00:00:00Z"^^xsd:dateTime .
+
+wd:Q16329711 wdt:P582 "1831-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q56280276 wdt:P582 "1832-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q879980 wdt:P582 "1832-08-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q2584439 wdt:P582 "1833-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q22936451 wdt:P582 "1832-06-15T00:00:00Z"^^xsd:dateTime .
+
+wd:Q115514014 wdt:P582 "1832-12-08T00:00:00Z"^^xsd:dateTime .
+
+wd:Q123508153 wdt:P582 "1832-03-28T00:00:00Z"^^xsd:dateTime .
+
+wd:Q1237867 wdt:P582 "1834-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q3381219 wdt:P582 "1834-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q120801227 wdt:P582 "1833-11-18T00:00:00Z"^^xsd:dateTime .
+
+wd:Q16473092 wdt:P582 "1834-04-24T00:00:00Z"^^xsd:dateTime .
+
+wd:Q131412563 wdt:P582 "1835-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q5887865 wdt:P582 "1836-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q20617481 wdt:P582 "1836-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q28131511 wdt:P582 "1836-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q1369423 wdt:P582 "1836-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q5392819 wdt:P582 "1838-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q5317509 wdt:P582 "1839-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q7148030 wdt:P582 "1838-12-04T00:00:00Z"^^xsd:dateTime .
+
+wd:Q135410476 wdt:P582 "1838-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q698312 wdt:P582 "1839-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q856168 wdt:P582 "1839-03-09T00:00:00Z"^^xsd:dateTime .
+
+wd:Q9001194 wdt:P582 "1839-04-26T00:00:00Z"^^xsd:dateTime .
+
+wd:Q601811 wdt:P582 "1839-08-15T00:00:00Z"^^xsd:dateTime .
+
+wd:Q2600326 wdt:P582 "1841-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q2341073 wdt:P582 "1840-07-06T00:00:00Z"^^xsd:dateTime .
+
+wd:Q2976715 wdt:P582 "1842-08-14T00:00:00Z"^^xsd:dateTime .
+
+wd:Q4122577 wdt:P582 "1845-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q209297 wdt:P582 "1845-03-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q4126350 wdt:P582 "1847-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q1373933 wdt:P582 "1860-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q638530 wdt:P582 "1864-04-21T00:00:00Z"^^xsd:dateTime .
+
+wd:Q90026836 wdt:P582 "1869-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q1178424 wdt:P582 "1876-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q130601874 wdt:P582 "1887-01-01T00:00:00Z"^^xsd:dateTime .
+
+wd:Q12203897 wdt:P582 "1962-01-01T00:00:00Z"^^xsd:dateTime .
