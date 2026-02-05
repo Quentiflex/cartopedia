@@ -26,7 +26,7 @@ PREFIX ex: <http://example.org/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?participant ?participantLabel ?lat ?lon ?warLabel ?warStart ?warEnd
+SELECT ?participant ?participantLabel ?lat ?lon ?war ?warLabel ?warStart ?warEnd
 WHERE {
   ?war a ex:War ;
        rdfs:label ?warLabel ;

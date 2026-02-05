@@ -16,12 +16,14 @@ function parseParticipationBinding(b: SparqlBinding): {
   participantLabel: string;
   lat: number;
   lon: number;
+  war: string;
   warLabel: string;
   warStart: string;
   warEnd: string | null;
 } | null {
   const participant = b.participant?.value;
   const participantLabel = b.participantLabel?.value;
+  const war = b.war?.value;
   const warLabel = b.warLabel?.value;
   const warStart = b.warStart?.value;
   const latRaw = b.lat?.value;
@@ -29,6 +31,7 @@ function parseParticipationBinding(b: SparqlBinding): {
   if (
     !participant ||
     !participantLabel ||
+    !war ||
     !warLabel ||
     !warStart ||
     latRaw == null ||
@@ -44,6 +47,7 @@ function parseParticipationBinding(b: SparqlBinding): {
     participantLabel,
     lat,
     lon,
+    war,
     warLabel,
     warStart,
     warEnd: b.warEnd?.value ?? null,
@@ -68,7 +72,7 @@ export async function getWarParticipations(
       latitude: number;
       longitude: number;
       warLabels: string[];
-      wars: { label: string; startDate: string; endDate: string | null }[];
+      wars: { id: string; label: string; startDate: string; endDate: string | null }[];
     }
   >();
 
@@ -78,6 +82,7 @@ export async function getWarParticipations(
     const key = row.participant;
     const existing = byKey.get(key);
     const warEntry = {
+      id: row.war,
       label: row.warLabel,
       startDate: row.warStart,
       endDate: row.warEnd,

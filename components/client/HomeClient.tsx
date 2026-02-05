@@ -4,11 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CountryDetailPanel } from "./CountryDetailPanel";
+import { EntityDetailPanel } from "./EntityDetailPanel";
 import { GanttChart } from "./GanttChart";
 import { Map } from "./Map";
 import { Timeline, type TimeWindow } from "./Timeline";
-import { WarParticipationPanel } from "./WarParticipationPanel";
 import type { CShapesCountry, War, WarParticipation } from "@/types/wars";
+
+type EntityInstance = {
+  iri: string;
+  label: string;
+  properties: Array<{ property: string; value: string; valueIri?: string; isLiteral: boolean }>;
+  incomingRelations?: Array<{ property: string; subject: string; subjectIri: string }>;
+};
 
 type ViewMode = "map" | "gantt";
 
@@ -38,10 +45,11 @@ export function HomeClient({
   viewMode,
 }: HomeClientProps) {
   const router = useRouter();
-  const [selectedParticipation, setSelectedParticipation] =
-    useState<WarParticipation | null>(null);
   const [selectedCountry, setSelectedCountry] =
     useState<CShapesCountry | null>(null);
+  const [selectedEntity, setSelectedEntity] = useState<EntityInstance | null>(null);
+  const [entityHistory, setEntityHistory] = useState<EntityInstance[]>([]);
+  const [loadingEntity, setLoadingEntity] = useState(false);
 
   const handleTimeWindowChange = (window: TimeWindow) => {
     router.push(buildSearchParams({
@@ -59,6 +67,57 @@ export function HomeClient({
     }));
   };
 
+  // Fetch entity details by IRI and navigate to it
+  const navigateToEntity = async (iri: string) => {
+    setLoadingEntity(true);
+    try {
+      const response = await fetch(`/api/ontology/entity?iri=${encodeURIComponent(iri)}`);
+      
+      if (!response.ok) {
+        console.error("Failed to fetch entity:", response.statusText);
+        return;
+      }
+
+      const entityData: EntityInstance = await response.json();
+      
+      // Push current entity to history if it exists
+      if (selectedEntity) {
+        setEntityHistory(prev => [...prev, selectedEntity]);
+      }
+      
+      setSelectedEntity(entityData);
+    } catch (err) {
+      console.error("Error fetching entity:", err);
+    } finally {
+      setLoadingEntity(false);
+    }
+  };
+
+  // Go back to previous entity in history
+  const goBackInHistory = () => {
+    if (entityHistory.length === 0) return;
+    
+    const previousEntity = entityHistory[entityHistory.length - 1];
+    setEntityHistory(prev => prev.slice(0, -1));
+    setSelectedEntity(previousEntity);
+  };
+
+  // Close panel and clear history
+  const closeEntityPanel = () => {
+    setSelectedEntity(null);
+    setEntityHistory([]);
+  };
+
+  // Handle clicking on a participation marker - show the first war
+  const handleParticipationClick = async (participation: WarParticipation) => {
+    // For now, we'll show the first war from the participation
+    // In the future, we could show a menu if there are multiple wars
+    if (participation.wars.length > 0) {
+      const warId = participation.wars[0].id;
+      await navigateToEntity(warId);
+    }
+  };
+
   return (
     <div className="relative h-screen w-full overflow-hidden bg-zinc-900">
       {viewMode === "map" ? (
@@ -66,24 +125,38 @@ export function HomeClient({
           participations={participations}
           timeWindow={timeWindow}
           onParticipationClick={(p) => {
-            setSelectedParticipation(p);
+            handleParticipationClick(p);
             setSelectedCountry(null);
           }}
           onCountryClick={(c) => {
             setSelectedCountry(c);
-            setSelectedParticipation(null);
+            closeEntityPanel();
           }}
         />
       ) : (
         <div className="absolute inset-0 flex flex-col pt-20 pb-6">
-          <GanttChart wars={wars} />
+          <GanttChart 
+            wars={wars}
+            onWarClick={(war) => {
+              navigateToEntity(war.id);
+              setSelectedCountry(null);
+            }}
+          />
         </div>
       )}
-      {selectedParticipation && (
-        <WarParticipationPanel
-          participation={selectedParticipation}
-          onClose={() => setSelectedParticipation(null)}
+      {selectedEntity && (
+        <EntityDetailPanel
+          entity={selectedEntity}
+          onClose={closeEntityPanel}
+          onNavigate={navigateToEntity}
+          onBack={goBackInHistory}
+          canGoBack={entityHistory.length > 0}
         />
+      )}
+      {loadingEntity && (
+        <div className="absolute right-0 top-0 z-40 flex h-full w-80 min-w-[280px] max-w-[90vw] items-center justify-center border-l border-zinc-700 bg-zinc-900/95 backdrop-blur sm:w-96">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-600 border-t-amber-500" />
+        </div>
       )}
       {selectedCountry && (
         <CountryDetailPanel

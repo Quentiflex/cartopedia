@@ -31,7 +31,7 @@ export default async function Home({
 
   const [participations, wars] = await Promise.all([
     getWarParticipations(start, end),
-    viewMode === "gantt" ? getWars(start, end) : Promise.resolve([]),
+    getWars(start, end),
   ]);
 
   const timeWindow = { start, end };

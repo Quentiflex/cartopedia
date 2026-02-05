@@ -9,7 +9,7 @@ export type WarParticipation = {
   latitude: number;
   longitude: number;
   warLabels: string[];
-  wars: { label: string; startDate: string; endDate: string | null }[];
+  wars: { id: string; label: string; startDate: string; endDate: string | null }[];
 };
 
 /**
