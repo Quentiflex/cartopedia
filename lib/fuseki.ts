@@ -137,6 +137,9 @@ export function buildWarsQuery(startYear: number, endYear: number): string {
   );
 }
 
+/** Timeout for SPARQL requests (ms). Prevents the server from hanging if Fuseki is down. */
+const SPARQL_TIMEOUT_MS = 15_000;
+
 /**
  * Execute a SPARQL SELECT and return parsed bindings.
  */
@@ -148,11 +151,28 @@ export async function runSparqlSelect(query: string): Promise<SparqlBinding[]> {
   const auth = getAuthHeader();
   if (auth) headers.Authorization = auth;
 
-  const res = await fetch(FUSEKI_SPARQL_URL, {
-    method: "POST",
-    headers,
-    body: query,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), SPARQL_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(FUSEKI_SPARQL_URL, {
+      method: "POST",
+      headers,
+      body: query,
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error(
+        `SPARQL request timed out after ${SPARQL_TIMEOUT_MS / 1000}s. ` +
+          `Is Fuseki running at ${FUSEKI_SPARQL_URL}?`
+      );
+    }
+    throw err;
+  }
+  clearTimeout(timeoutId);
 
   const text = await res.text();
 

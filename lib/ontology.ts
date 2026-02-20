@@ -1,15 +1,10 @@
 /**
- * Server-side ontology loading: Fuseki first, then ontology.ttl fallback.
+ * Server-side ontology loading from app/db/schema/ontology.ttl.
  * Use from Server Components or API routes.
  */
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import {
-  ONTOLOGY_CLASSES_QUERY,
-  ONTOLOGY_PROPERTIES_QUERY,
-  runSparqlSelect,
-} from "@/lib/fuseki";
 
 const EX = "http://example.org/ontology/";
 const RDFS = "http://www.w3.org/2000/01/rdf-schema#";
@@ -166,62 +161,11 @@ function parseTtl(content: string): OntologyData {
   };
 }
 
-type OntologyBinding = {
-  class?: { value: string };
-  label?: { value: string };
-  comment?: { value: string };
-  subClassOf?: { value: string };
-  prop?: { value: string };
-  domain?: { value: string };
-  range?: { value: string };
-};
-
-async function getOntologyFromStore(): Promise<OntologyData | null> {
-  try {
-    const [classBindings, propBindings] = await Promise.all([
-      runSparqlSelect(ONTOLOGY_CLASSES_QUERY) as Promise<OntologyBinding[]>,
-      runSparqlSelect(ONTOLOGY_PROPERTIES_QUERY) as Promise<OntologyBinding[]>,
-    ]);
-
-    const classes: OntologyClass[] = classBindings.map((b) => {
-      const fullIri = b.class!.value!;
-      const id = localName(fullIri);
-      return {
-        id,
-        fullIri,
-        label: b.label?.value ?? id,
-        comment: b.comment?.value ?? null,
-        subClassOf: b.subClassOf?.value ?? null,
-      };
-    });
-
-    const properties: OntologyProperty[] = propBindings.map((b) => {
-      const fullIri = b.prop!.value!;
-      const id = localName(fullIri);
-      return {
-        id,
-        fullIri,
-        label: b.label?.value ?? id,
-        comment: b.comment?.value ?? null,
-        domain: b.domain?.value ?? null,
-        range: b.range?.value ?? null,
-      };
-    });
-
-    if (classes.length === 0 && properties.length === 0) return null;
-    return { classes, properties };
-  } catch {
-    return null;
-  }
-}
-
 /**
- * Load ontology: from Fuseki if available, otherwise from app/db/schema/ontology.ttl.
+ * Load ontology from app/db/schema/ontology.ttl.
  * Safe to call from Server Components and API routes.
  */
 export async function getOntology(): Promise<OntologyData> {
-  const fromStore = await getOntologyFromStore();
-  if (fromStore != null) return fromStore;
   const path = join(process.cwd(), "app", "db", "schema", "ontology.ttl");
   const content = await readFile(path, "utf-8");
   return parseTtl(content);

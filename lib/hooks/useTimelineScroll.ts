@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const YEAR_WIDTH_PX = 52;
-const WINDOW_SIZE = 5;
-const WINDOW_WIDTH_PX = WINDOW_SIZE * YEAR_WIDTH_PX;
-
 type UseTimelineScrollOptions = {
   windowStart: number;
+  yearWidthPx: number;
+  windowSizePx: number;
   yearMin: number;
   yearMax: number;
   isPlaying: boolean;
@@ -19,6 +17,8 @@ type UseTimelineScrollOptions = {
  */
 export function useTimelineScroll({
   windowStart,
+  yearWidthPx,
+  windowSizePx,
   yearMin,
   yearMax,
   isPlaying,
@@ -34,18 +34,18 @@ export function useTimelineScroll({
   // Conversion functions
   const scrollLeftToWindowStart = useCallback(
     (scrollLeft: number) => {
-      const yearIndex = (scrollLeft + (containerWidth - WINDOW_WIDTH_PX) / 2) / YEAR_WIDTH_PX;
+      const yearIndex = (scrollLeft + (containerWidth - windowSizePx) / 2) / yearWidthPx;
       return clampWindowStart(yearMin + Math.round(yearIndex));
     },
-    [containerWidth, yearMin, clampWindowStart]
+    [containerWidth, yearMin, clampWindowStart, yearWidthPx, windowSizePx]
   );
 
   const windowStartToScrollLeft = useCallback(
     (start: number) => {
       const yearIndex = start - yearMin;
-      return yearIndex * YEAR_WIDTH_PX - (containerWidth - WINDOW_WIDTH_PX) / 2;
+      return yearIndex * yearWidthPx - (containerWidth - windowSizePx) / 2;
     },
-    [containerWidth, yearMin]
+    [containerWidth, yearMin, yearWidthPx, windowSizePx]
   );
 
   // Observe container size changes

@@ -1,22 +1,16 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
-import { Protocol } from "pmtiles";
-import { getCartopediaMapStyle } from "@/lib/protomaps-style";
 import { participationsToGeoJSON, featureToCountry, emptyGeoJSON } from "@/lib/utils/map-utils";
+import { cshapesNameToIso } from "@/lib/cshapes-to-iso";
 import type { CShapesCountry, WarParticipation } from "@/types/wars";
+import { CURATED_TYPES, CATEGORY_COLORS, type WikidataMapEntity } from "@/lib/wikidata-curated-types";
 
-// PMTiles protocol: register once for app lifetime
-let pmtilesProtocolRegistered = false;
-function ensurePmtilesProtocol() {
-  if (!pmtilesProtocolRegistered) {
-    const protocol = new Protocol();
-    maplibregl.addProtocol("pmtiles", protocol.tile);
-    pmtilesProtocolRegistered = true;
-  }
-}
+export type MapFillMode = "default" | "population";
 
-const PROTOMAPS_PMTILES_URL =
-  "https://r2-public.protomaps.com/protomaps-sample-datasets/protomaps-basemap-opensource-20230408.pmtiles";
+const DEMOTILES_STYLE_URL = "https://demotiles.maplibre.org/style.json";
+
+// Layers in the demotiles style that draw political boundaries
+const BOUNDARY_LAYER_PATTERN = /admin|boundary|disputed/i;
 
 const DEFAULT_CENTER: [number, number] = [10, 30];
 const DEFAULT_ZOOM = 2;
@@ -26,18 +20,116 @@ const LAYER_CSHAPES_LINE_ID = "cshapes-line";
 const SOURCE_ID = "war-participants";
 const LAYER_CIRCLES_ID = "war-participants-circles";
 const LAYER_LABELS_ID = "war-participants-labels";
+const SOURCE_WIKIDATA = "wikidata-overlay";
+const LAYER_WIKIDATA_CIRCLES = "wikidata-overlay-circles";
+const LAYER_WIKIDATA_LABELS = "wikidata-overlay-labels";
 
 const PARTICIPANT_COLOR = "#f59e0b";
 const LABEL_COLOR = "#fef3c7";
 const CSHAPES_FILL = "rgba(59, 130, 246, 0.2)";
 const CSHAPES_LINE = "rgba(59, 130, 246, 0.6)";
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/** Choropleth: linear scale from min to max; no data = transparent gray */
+function choroplethFill(minValue: number, maxValue: number): unknown[] {
+  const noData = "rgba(240, 240, 240, 0.6)";
+  const low = "rgba(158, 202, 225, 0.85)";
+  const mid = "rgba(66, 146, 198, 0.9)";
+  const high = "rgba(33, 113, 181, 0.95)";
+  const top = "rgba(8, 81, 156, 0.98)";
+  if (minValue === maxValue) {
+    return ["interpolate", ["linear"], ["coalesce", ["get", "value"], minValue], minValue, mid];
+  }
+  const range = maxValue - minValue;
+  const q1 = minValue + range * 0.25;
+  const q2 = minValue + range * 0.5;
+  const q3 = minValue + range * 0.75;
+  return [
+    "interpolate",
+    ["linear"],
+    ["coalesce", ["get", "value"], minValue - 1],
+    minValue - 1,
+    noData,
+    minValue,
+    low,
+    q1,
+    low,
+    q2,
+    mid,
+    q3,
+    high,
+    maxValue,
+    top,
+  ];
+}
+
 type UseMapLibreOptions = {
   participations: WarParticipation[];
   timeWindow: { start: number; end: number };
+  fillMode?: MapFillMode;
+  owidDataset?: string;
+  wikidataEntities?: WikidataMapEntity[];
+  /** Show the CShapes political boundaries layer (default true). */
+  showCShapes?: boolean;
   onParticipationClick?: (participation: WarParticipation) => void;
   onCountryClick?: (country: CShapesCountry) => void;
+  onWikidataEntityClick?: (iri: string) => void;
 };
+
+/**
+ * Compute the display opacity for an entity based on when it stopped being
+ * active relative to the time window.
+ *
+ * Rule: the "current year" is the window's last year (end).
+ *   • No end date, or ended at/after windowEnd  → 1.0  (still active, fully visible)
+ *   • Ended at windowEnd - 1                    → ~0.75 (just ended, slightly dimmed)
+ *   • Ended at windowStart                      → 0.0  (oldest in window, invisible)
+ *   • Ended before windowStart                  → 0.0  (gone, invisible)
+ *
+ * Linear interpolation between windowStart (0.0) and windowEnd (1.0).
+ */
+function entityOpacity(endYear: number | undefined, timeWindow: { start: number; end: number }): number {
+  const { start, end } = timeWindow;
+  // No known end date, or ended at/after the window's last year → fully visible.
+  if (endYear == null || endYear >= end) return 1.0;
+  // Ended before the window even started → invisible.
+  if (endYear <= start) return 0.0;
+  // Linear fade: endYear just before `end` is almost fully visible; at `start` is invisible.
+  return (endYear - start) / (end - start);
+}
+
+function categoryColor(typeIri: string): string {
+  const meta = CURATED_TYPES.find((t) => t.iri === typeIri);
+  return meta ? (CATEGORY_COLORS[meta.category] ?? "#a855f7") : "#a855f7";
+}
+
+function wikidataToGeoJSON(
+  entities: WikidataMapEntity[],
+  timeWindow: { start: number; end: number }
+): GeoJSON.FeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: entities.map((e) => ({
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [e.lon, e.lat] },
+      properties: {
+        iri: e.iri,
+        label: e.label,
+        description: e.description ?? "",
+        typeLabel: e.typeLabel,
+        color: categoryColor(e.typeIri),
+        opacity: entityOpacity(e.endYear, timeWindow),
+      },
+    })),
+  };
+}
 
 /**
  * Custom hook for MapLibre GL initialization and management
@@ -45,75 +137,118 @@ type UseMapLibreOptions = {
  */
 export function useMapLibre(
   containerRef: React.RefObject<HTMLDivElement | null>,
-  { participations, timeWindow, onParticipationClick, onCountryClick }: UseMapLibreOptions
+  { participations, timeWindow, fillMode = "default", owidDataset, wikidataEntities, showCShapes = true, onParticipationClick, onCountryClick, onWikidataEntityClick }: UseMapLibreOptions
 ) {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const sourceAddedRef = useRef(false);
-  
-  // Store latest values in refs to avoid recreating event handlers
+
   const participationsRef = useRef(participations);
   const onParticipationClickRef = useRef(onParticipationClick);
   const onCountryClickRef = useRef(onCountryClick);
-  
+  const onWikidataEntityClickRef = useRef(onWikidataEntityClick);
+  const timeWindowRef = useRef(timeWindow);
+  const fillModeRef = useRef(fillMode);
+  const owidDatasetRef = useRef(owidDataset);
+  const wikidataEntitiesRef = useRef(wikidataEntities);
+  const showCShapesRef = useRef(showCShapes);
+
   participationsRef.current = participations;
   onParticipationClickRef.current = onParticipationClick;
   onCountryClickRef.current = onCountryClick;
+  onWikidataEntityClickRef.current = onWikidataEntityClick;
+  timeWindowRef.current = timeWindow;
+  fillModeRef.current = fillMode;
+  owidDatasetRef.current = owidDataset;
+  wikidataEntitiesRef.current = wikidataEntities;
+  showCShapesRef.current = showCShapes;
 
   // Initialize map once
   useEffect(() => {
     if (!containerRef.current) return;
 
-    ensurePmtilesProtocol();
-    const mapStyle = getCartopediaMapStyle(PROTOMAPS_PMTILES_URL, {
-      lang: "en",
-      flavor: "light",
-    });
-
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: mapStyle,
+      style: DEMOTILES_STYLE_URL,
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
+    });
+
+    map.on("style.load", () => {
+      // Enable globe projection
+      try {
+        map.setProjection({ type: "globe" });
+      } catch {
+        // ignore if globe not supported in this build
+      }
+      // Remove all political boundary layers
+      const styleLayers = map.getStyle().layers ?? [];
+      for (const layer of styleLayers) {
+        if (BOUNDARY_LAYER_PATTERN.test(layer.id)) {
+          map.removeLayer(layer.id);
+        }
+      }
     });
 
     map.addControl(new maplibregl.NavigationControl(), "top-right");
 
     map.on("load", () => {
-      // Add CShapes source and layers
-      map.addSource(SOURCE_CSHAPES_ID, {
-        type: "geojson",
-        data: emptyGeoJSON,
-      });
-      
-      map.addLayer({
-        id: LAYER_CSHAPES_FILL_ID,
-        type: "fill",
-        source: SOURCE_CSHAPES_ID,
-        paint: {
-          "fill-color": CSHAPES_FILL,
-          "fill-outline-color": CSHAPES_LINE,
-        },
-      });
-      
-      map.addLayer({
-        id: LAYER_CSHAPES_LINE_ID,
-        type: "line",
-        source: SOURCE_CSHAPES_ID,
-        paint: {
-          "line-color": CSHAPES_LINE,
-          "line-width": 1,
-        },
-      });
+      // ── CShapes source and layers (optional) ───────────────────────────────
+      map.addSource(SOURCE_CSHAPES_ID, { type: "geojson", data: emptyGeoJSON });
 
-      // Load initial CShapes data
-      const src = map.getSource(SOURCE_CSHAPES_ID) as maplibregl.GeoJSONSource | undefined;
-      if (src) {
-        const start = timeWindow.start;
-        fetch(`/api/cshapes?start=${start}&end=${start}`)
-          .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.statusText))))
-          .then((data: GeoJSON.FeatureCollection) => src.setData(data))
-          .catch(() => src.setData(emptyGeoJSON));
-      }
+      if (showCShapesRef.current) {
+        map.addLayer({
+          id: LAYER_CSHAPES_FILL_ID,
+          type: "fill",
+          source: SOURCE_CSHAPES_ID,
+          paint: { "fill-color": CSHAPES_FILL, "fill-outline-color": CSHAPES_LINE },
+        });
+        map.addLayer({
+          id: LAYER_CSHAPES_LINE_ID,
+          type: "line",
+          source: SOURCE_CSHAPES_ID,
+          paint: { "line-color": CSHAPES_LINE, "line-width": 1 },
+        });
+
+        // Load CShapes data as soon as map is ready (effect may have run before "load")
+        const src = map.getSource(SOURCE_CSHAPES_ID) as maplibregl.GeoJSONSource | undefined;
+        if (src) {
+          const start = timeWindowRef.current.start;
+          const isChoropleth = fillModeRef.current === "population";
+          if (!isChoropleth) {
+            fetch(`/api/cshapes?start=${start}&end=${start}`)
+              .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.statusText))))
+              .then((data: GeoJSON.FeatureCollection) => src.setData(data))
+              .catch(() => src.setData(emptyGeoJSON));
+            map.setPaintProperty(LAYER_CSHAPES_FILL_ID, "fill-color", CSHAPES_FILL);
+          } else {
+            const dataset = owidDatasetRef.current ?? "population-with-un-projections";
+            Promise.all([
+              fetch(`/api/cshapes?start=${start}&end=${start}`).then((r) =>
+                r.ok ? r.json() : Promise.reject(new Error(r.statusText))
+              ) as Promise<GeoJSON.FeatureCollection>,
+              fetch(`/api/owid/data?dataset=${encodeURIComponent(dataset)}&year=${start}`).then((r) =>
+                r.ok ? r.json() : Promise.reject(new Error(r.statusText))
+              ) as Promise<{ byIso: Record<string, number>; byEntity: Record<string, number>; minValue: number; maxValue: number }>,
+            ])
+            .then(([cshapesData, { byEntity, byIso, minValue, maxValue }]) => {
+              const features = (cshapesData.features ?? []).map((f) => {
+                const props = { ...(f.properties as Record<string, unknown>) };
+                const name = typeof props.cntry_name === "string" ? props.cntry_name : "";
+                const iso = cshapesNameToIso(name);
+                const value = byEntity[name] ?? (iso ? byIso[iso] : undefined);
+                props.value = typeof value === "number" ? value : undefined;
+                return { ...f, properties: props };
+              });
+              src.setData({ type: "FeatureCollection", features });
+              map.setPaintProperty(LAYER_CSHAPES_FILL_ID, "fill-color", choroplethFill(minValue, maxValue));
+            })
+            .catch(() => {
+              src.setData(emptyGeoJSON);
+              map.setPaintProperty(LAYER_CSHAPES_FILL_ID, "fill-color", CSHAPES_FILL);
+            });
+          }
+        }
+      } // end if (showCShapesRef.current)
 
       // Add war participants source and layers
       map.addSource(SOURCE_ID, {
@@ -139,17 +274,77 @@ export function useMapLibre(
         source: SOURCE_ID,
         layout: {
           "text-field": ["get", "warLabels"],
-          "text-size": 11,
+          "text-size": ["interpolate", ["linear"], ["zoom"], 2, 12, 8, 15],
           "text-offset": [0, 1.4],
           "text-anchor": "top",
           "text-max-width": 14,
-          "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-optional": true,
         },
         paint: {
-          "text-color": LABEL_COLOR,
-          "text-halo-color": "rgba(0,0,0,0.85)",
-          "text-halo-width": 1.5,
+          "text-color": "#ffffff",
+          "text-halo-color": "rgba(0,0,0,1)",
+          "text-halo-width": 2,
         },
+      });
+
+      // ── Wikidata overlay ────────────────────────────────────────────────────
+      map.addSource(SOURCE_WIKIDATA, {
+        type: "geojson",
+        data: wikidataToGeoJSON(wikidataEntitiesRef.current ?? [], timeWindowRef.current),
+      });
+
+      map.addLayer({
+        id: LAYER_WIKIDATA_CIRCLES,
+        type: "circle",
+        source: SOURCE_WIKIDATA,
+        paint: {
+          "circle-radius": 7,
+          "circle-color": ["get", "color"],
+          "circle-stroke-width": 1.5,
+          "circle-stroke-color": "#fff",
+          "circle-opacity": ["get", "opacity"],
+          "circle-stroke-opacity": ["get", "opacity"],
+        },
+      });
+
+      map.addLayer({
+        id: LAYER_WIKIDATA_LABELS,
+        type: "symbol",
+        source: SOURCE_WIKIDATA,
+        layout: {
+          "text-field": [
+            "format",
+            ["get", "label"],    { "font-scale": 1.0 },
+            "\n",                {},
+            ["get", "typeLabel"], { "font-scale": 0.75 },
+          ],
+          "text-size": ["interpolate", ["linear"], ["zoom"], 2, 12, 8, 15],
+          "text-offset": [0, 1.3],
+          "text-anchor": "top",
+          "text-max-width": 14,
+          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-optional": true,
+        },
+        paint: {
+          "text-color": "#ffffff",
+          "text-halo-color": "rgba(0,0,0,1)",
+          "text-halo-width": 2,
+          "text-opacity": ["get", "opacity"],
+        },
+      });
+
+      map.on("mouseenter", LAYER_WIKIDATA_CIRCLES, () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", LAYER_WIKIDATA_CIRCLES, () => {
+        map.getCanvas().style.cursor = "";
+      });
+      map.on("click", LAYER_WIKIDATA_CIRCLES, (e) => {
+        const cb = onWikidataEntityClickRef.current;
+        if (!cb || !e.features?.[0]?.properties) return;
+        const { iri } = e.features[0].properties as { iri?: string };
+        if (iri) cb(iri);
       });
 
       // Participation circles hover and click
@@ -168,12 +363,40 @@ export function useMapLibre(
         if (part) cb(part);
       });
 
-      // CShapes hover and click
-      map.on("mouseenter", LAYER_CSHAPES_FILL_ID, () => {
+      // CShapes hover: show value tooltip when in choropleth mode
+      const hoverPopup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        className: "cartopedia-hover-popup",
+      });
+      const showHoverPopup = (e: maplibregl.MapLayerMouseEvent) => {
+        const f = e.features?.[0];
+        if (!f?.properties) return;
+        const props = f.properties as Record<string, unknown>;
+        const name = (typeof props.cntry_name === "string" ? props.cntry_name : "") || "Unknown";
+        const raw = props.value;
+        const value =
+          typeof raw === "number"
+            ? raw >= 1e6
+              ? `${(raw / 1e6).toFixed(2)}M`
+              : raw >= 1e3
+                ? `${(raw / 1e3).toFixed(2)}K`
+                : Number.isInteger(raw)
+                  ? String(raw)
+                  : raw.toFixed(2)
+            : "—";
+        hoverPopup.setLngLat(e.lngLat).setHTML(`<strong>${escapeHtml(name)}</strong><br/>${escapeHtml(value)}`).addTo(map);
+      };
+      map.on("mouseenter", LAYER_CSHAPES_FILL_ID, (e) => {
         map.getCanvas().style.cursor = "pointer";
+        if (fillModeRef.current === "population") showHoverPopup(e);
+      });
+      map.on("mousemove", LAYER_CSHAPES_FILL_ID, (e) => {
+        if (fillModeRef.current === "population") showHoverPopup(e);
       });
       map.on("mouseleave", LAYER_CSHAPES_FILL_ID, () => {
         map.getCanvas().style.cursor = "";
+        hoverPopup.remove();
       });
       map.on("click", LAYER_CSHAPES_FILL_ID, (e) => {
         const cb = onCountryClickRef.current;
@@ -194,7 +417,7 @@ export function useMapLibre(
       mapRef.current = null;
       sourceAddedRef.current = false;
     };
-  }, [containerRef, timeWindow.start]);
+  }, [containerRef]);
 
   // Update participations data when it changes
   useEffect(() => {
@@ -207,20 +430,72 @@ export function useMapLibre(
     }
   }, [participations]);
 
-  // Update CShapes data when time window changes
+  // Recompute and push wikidata GeoJSON when either the entities or the time
+  // window changes (opacity depends on both).
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !sourceAddedRef.current) return;
-    
+    const src = map.getSource(SOURCE_WIKIDATA) as maplibregl.GeoJSONSource | undefined;
+    if (src) src.setData(wikidataToGeoJSON(wikidataEntities ?? [], timeWindowRef.current));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wikidataEntities]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !sourceAddedRef.current) return;
+    const src = map.getSource(SOURCE_WIKIDATA) as maplibregl.GeoJSONSource | undefined;
+    if (src) src.setData(wikidataToGeoJSON(wikidataEntitiesRef.current ?? [], timeWindow));
+  // Use primitive values as deps so this only fires when the window actually moves
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeWindow.start, timeWindow.end]);
+
+  // Update CShapes data and fill style when time window or fill mode changes
+  useEffect(() => {
+    if (!showCShapes) return;
+    const map = mapRef.current;
+    if (!map || !sourceAddedRef.current) return;
+
     const source = map.getSource(SOURCE_CSHAPES_ID) as maplibregl.GeoJSONSource | undefined;
     if (!source) return;
-    
+
     const { start } = timeWindow;
-    fetch(`/api/cshapes?start=${start}&end=${start}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.statusText))))
-      .then((data: GeoJSON.FeatureCollection) => source.setData(data))
-      .catch(() => source.setData(emptyGeoJSON));
-  }, [timeWindow]);
+    const isChoropleth = fillMode === "population";
+
+    if (!isChoropleth) {
+      fetch(`/api/cshapes?start=${start}&end=${start}`)
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.statusText))))
+        .then((data: GeoJSON.FeatureCollection) => source.setData(data))
+        .catch(() => source.setData(emptyGeoJSON));
+      map.setPaintProperty(LAYER_CSHAPES_FILL_ID, "fill-color", CSHAPES_FILL);
+      return;
+    }
+
+    const dataset = owidDataset ?? "population-with-un-projections";
+    Promise.all([
+      fetch(`/api/cshapes?start=${start}&end=${start}`).then((res) =>
+        res.ok ? res.json() : Promise.reject(new Error(res.statusText))
+      ) as Promise<GeoJSON.FeatureCollection>,
+      fetch(`/api/owid/data?dataset=${encodeURIComponent(dataset)}&year=${start}`).then((res) =>
+        res.ok ? res.json() : Promise.reject(new Error(res.statusText))
+      ) as Promise<{ byIso: Record<string, number>; byEntity: Record<string, number>; minValue: number; maxValue: number }>,
+    ])
+      .then(([cshapesData, { byEntity, byIso, minValue, maxValue }]) => {
+        const features = (cshapesData.features ?? []).map((f) => {
+          const props = { ...(f.properties as Record<string, unknown>) };
+          const name = typeof props.cntry_name === "string" ? props.cntry_name : "";
+          const iso = cshapesNameToIso(name);
+          const value = byEntity[name] ?? (iso ? byIso[iso] : undefined);
+          props.value = typeof value === "number" ? value : undefined;
+          return { ...f, properties: props };
+        });
+        source.setData({ type: "FeatureCollection", features });
+        map.setPaintProperty(LAYER_CSHAPES_FILL_ID, "fill-color", choroplethFill(minValue, maxValue));
+      })
+      .catch(() => {
+        source.setData(emptyGeoJSON);
+        map.setPaintProperty(LAYER_CSHAPES_FILL_ID, "fill-color", CSHAPES_FILL);
+      });
+  }, [timeWindow, fillMode, owidDataset]);
 
   return mapRef;
 }

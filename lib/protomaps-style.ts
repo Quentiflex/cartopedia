@@ -125,6 +125,7 @@ export function getCartopediaMapStyle(
 
   return {
     version: 8 as const,
+    projection: { type: "globe" as const },
     glyphs:
       "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf",
     sprite: `https://protomaps.github.io/basemaps-assets/sprites/v4/${options?.flavor ?? "light"}`,

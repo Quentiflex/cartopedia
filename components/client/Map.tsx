@@ -2,32 +2,47 @@
 
 import { useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useMapLibre } from "@/lib/hooks/useMapLibre";
+import { useMapLibre, type MapFillMode } from "@/lib/hooks/useMapLibre";
 import type { CShapesCountry, WarParticipation } from "@/types/wars";
+import type { WikidataMapEntity } from "@/lib/wikidata-curated-types";
 
 export type TimeWindow = { start: number; end: number };
 
 type MapProps = {
   participations: WarParticipation[];
   timeWindow: TimeWindow;
+  fillMode?: MapFillMode;
+  owidDataset?: string;
+  wikidataEntities?: WikidataMapEntity[];
+  showCShapes?: boolean;
   onParticipationClick?: (participation: WarParticipation) => void;
   onCountryClick?: (country: CShapesCountry) => void;
+  onWikidataEntityClick?: (iri: string) => void;
 };
 
 export function Map({
   participations,
   timeWindow,
+  fillMode = "default",
+  owidDataset,
+  wikidataEntities,
+  showCShapes = true,
   onParticipationClick,
   onCountryClick,
+  onWikidataEntityClick,
 }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // All map logic is encapsulated in the custom hook
   useMapLibre(containerRef, {
     participations,
     timeWindow,
+    fillMode,
+    owidDataset,
+    wikidataEntities,
+    showCShapes,
     onParticipationClick,
     onCountryClick,
+    onWikidataEntityClick,
   });
 
   return (

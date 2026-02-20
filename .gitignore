@@ -44,3 +44,7 @@ next-env.d.ts
 /scripts/output
 
 data/*
+
+# temporary Wikidata chunk files (avoid watcher/bundle overhead)
+wikidata_chunk_*
+data_files/

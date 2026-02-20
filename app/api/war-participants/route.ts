@@ -1,33 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getWarParticipations } from "@/lib/data";
+import { NextResponse } from "next/server";
 
 /**
- * GET /api/war-participants?start=1826&end=1830
- * Returns participants (with coordinates) that took part in at least one war
- * overlapping the given year window.
+ * GET /api/war-participants?start=...&end=...
+ *
+ * Previously served war participant data from a local Fuseki dataset.
+ * That dataset is no longer used; returns an empty list.
+ * War data for the main map is now provided by the Wikidata overlay
+ * (/api/wikidata/map-entities).
  */
-export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
-  const startParam = searchParams.get("start");
-  const endParam = searchParams.get("end");
-  const startYear = startParam != null ? parseInt(startParam, 10) : 1820;
-  const endYear = endParam != null ? parseInt(endParam, 10) : 1830;
-
-  if (Number.isNaN(startYear) || Number.isNaN(endYear) || startYear > endYear) {
-    return NextResponse.json(
-      { error: "Invalid start/end years" },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const result = await getWarParticipations(startYear, endYear);
-    return NextResponse.json(result);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "SPARQL error";
-    return NextResponse.json(
-      { error: message },
-      { status: 502 }
-    );
-  }
+export async function GET() {
+  return NextResponse.json([]);
 }
