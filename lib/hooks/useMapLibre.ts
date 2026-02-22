@@ -7,7 +7,9 @@ import { CURATED_TYPES, CATEGORY_COLORS, type WikidataMapEntity } from "@/lib/wi
 
 export type MapFillMode = "default" | "population";
 
-const DEMOTILES_STYLE_URL = "https://demotiles.maplibre.org/style.json";
+// CARTO dark-matter: reliable, free, no API key required.
+// Matches the app's dark UI and keeps country/water contrast without clutter.
+const DEMOTILES_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
 // Layers in the demotiles style that draw political boundaries
 const BOUNDARY_LAYER_PATTERN = /admin|boundary|disputed/i;

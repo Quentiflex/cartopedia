@@ -3,7 +3,7 @@ import { CURATED_TYPES, type WikidataMapEntity } from "@/lib/wikidata-curated-ty
 
 const LIVE_ENDPOINT = "https://query.wikidata.org/sparql";
 const USER_AGENT = "Cartopedia/1.0 (personal history explorer; https://github.com/cartopedia)";
-const TIMEOUT_MS = 25_000;
+const TIMEOUT_MS = 35_000;
 
 /** Parse "Point(lon lat)" WKT literal (optionally prefixed with a globe IRI). */
 function parseWkt(wkt: string): { lat: number; lon: number } | null {
@@ -13,6 +13,18 @@ function parseWkt(wkt: string): { lat: number; lon: number } | null {
   const lat = parseFloat(m[2]);
   if (isNaN(lon) || isNaN(lat)) return null;
   return { lon, lat };
+}
+
+/**
+ * Parse a year from an xsd:dateTime string.
+ * Handles both CE ("1830-01-01T00:00:00Z") and BCE ("-0048-01-01T00:00:00Z").
+ * parseInt(".slice(0,4)") breaks for negative years — use a regex instead.
+ */
+function parseYearStr(s: string | undefined): number | undefined {
+  if (!s) return undefined;
+  const m = s.match(/^(-?\d+)-/);
+  const y = m ? parseInt(m[1], 10) : NaN;
+  return isNaN(y) ? undefined : y;
 }
 
 /**
@@ -48,7 +60,36 @@ export async function GET(request: NextRequest) {
   // Build a label lookup: IRI → { label, category }
   const typeMeta = new Map(CURATED_TYPES.map((t) => [t.iri, t]));
 
-  const valuesBlock = typeIris.map((iri) => `<${iri}>`).join(" ");
+  // Split into person types (People category) vs entity types (everything else).
+  // In Wikidata, persons are wdt:P31 Q5 (human) with roles in wdt:P106 (occupation)
+  // or wdt:P39 (position held).  Querying P31 for person-role concepts returns wrong
+  // results (awards, events, etc. that happen to be classified under that concept).
+  const personTypeIris  = typeIris.filter(iri => typeMeta.get(iri)?.category === "People");
+  const entityTypeIris  = typeIris.filter(iri => typeMeta.get(iri)?.category !== "People");
+
+  // Mandatory date property path used as an index filter inside each subquery.
+  // Requiring at least one of these triples lets Wikidata intersect two indexes
+  // (type + date) instead of scanning the entire type class — critical for broad
+  // types like Q7725634 (literary work) that have millions of instances.
+  const DATE_PATH = "wdt:P571|wdt:P580|wdt:P577|wdt:P575|wdt:P585";
+
+  const unionBranches: string[] = [];
+  if (entityTypeIris.length > 0) {
+    const vals = entityTypeIris.map(iri => `<${iri}>`).join(" ");
+    // Pre-filter by year inside the subquery so the 500-entity cap only applies
+    // to candidates that could actually fall in (or overlap) the requested window.
+    // YEAR(?someDate) <= endYear: started/published before the window closed.
+    unionBranches.push(
+      `  {\n    SELECT DISTINCT ?entity ?type WHERE {\n      VALUES ?type { ${vals} }\n      ?entity wdt:P31 ?type .\n      ?entity (${DATE_PATH}) ?someDate .\n      FILTER(YEAR(?someDate) <= ${endYear})\n    }\n    LIMIT 500\n  }`
+    );
+  }
+  if (personTypeIris.length > 0) {
+    const vals = personTypeIris.map(iri => `<${iri}>`).join(" ");
+    unionBranches.push(
+      `  {\n    SELECT DISTINCT ?entity ?type WHERE {\n      VALUES ?type { ${vals} }\n      ?entity wdt:P31 <http://www.wikidata.org/entity/Q5> .\n      ?entity (wdt:P106|wdt:P39) ?type .\n      ?entity wdt:P569 ?birthDate .\n      FILTER(YEAR(?birthDate) <= ${endYear})\n    }\n    LIMIT 500\n  }`
+    );
+  }
+  const typePattern = unionBranches.join("\n  UNION\n");
 
   const query = `
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -60,15 +101,21 @@ SELECT ?entity ?type
   (SAMPLE(?desc) AS ?description)
   (SAMPLE(?effectiveEnd) AS ?endDate)
 WHERE {
-  VALUES ?type { ${valuesBlock} }
-  ?entity wdt:P31 ?type .
+  ${typePattern}
 
   # ── Time filter ────────────────────────────────────────────────────────────
-  # P571 = inception, P580 = start time, P582 = end time, P585 = point in time
-  # P361 = part of  (one level up, used when the entity itself has no dates)
+  # P571 = inception           P580 = start time       P582 = end time
+  # P585 = point in time       P569 = date of birth    P570 = date of death
+  # P577 = publication date    (literary works, books)
+  # P575 = time of discovery   (inventions, scientific discoveries)
+  # P361 = part of             (inherit dates one level up)
   OPTIONAL { ?entity wdt:P571 ?inception }
   OPTIONAL { ?entity wdt:P580 ?startT }
+  OPTIONAL { ?entity wdt:P569 ?birthT }
+  OPTIONAL { ?entity wdt:P577 ?pubDate }
+  OPTIONAL { ?entity wdt:P575 ?discovT }
   OPTIONAL { ?entity wdt:P582 ?endT }
+  OPTIONAL { ?entity wdt:P570 ?deathT }
   OPTIONAL { ?entity wdt:P585 ?pointT }
   # Inherit dates from a parent event when the entity itself has none
   OPTIONAL {
@@ -78,9 +125,11 @@ WHERE {
     OPTIONAL { ?parent wdt:P582 ?parentEndT }
     OPTIONAL { ?parent wdt:P585 ?parentPointT }
   }
-  BIND(COALESCE(?startT, ?inception, ?pointT,
+  BIND(COALESCE(?startT, ?inception, ?birthT, ?pubDate, ?discovT, ?pointT,
                 ?parentStartT, ?parentInception, ?parentPointT) AS ?effectiveStart)
-  BIND(COALESCE(?endT, ?pointT,
+  # For point-in-time entities (books, inventions) that have no explicit end date,
+  # fall back to their creation/publication date so they don't appear across all of history.
+  BIND(COALESCE(?endT, ?deathT, ?pointT, ?pubDate, ?discovT,
                 ?parentEndT, ?parentPointT)                     AS ?effectiveEnd)
   # Require at least one temporal bound — entities with no dates at all are excluded.
   FILTER(BOUND(?effectiveStart) || BOUND(?effectiveEnd))
@@ -92,11 +141,15 @@ WHERE {
     (!BOUND(?effectiveEnd)   || YEAR(?effectiveEnd)   >= ${startYear})
   )
 
-  # ── Location (P625 → P276→P625 → P17→P625) ────────────────────────────────
+  # ── Location ─────────────────────────────────────────────────────────────
+  # P625 direct · P276 location · P17 country · P19 birth place (persons)
+  # P495 country of origin — resolves inventions, literary works, diseases, etc.
   OPTIONAL { ?entity wdt:P625 ?directCoord }
-  OPTIONAL { ?entity wdt:P276 ?loc  . ?loc  wdt:P625 ?locCoord  }
-  OPTIONAL { ?entity wdt:P17  ?ctry . ?ctry wdt:P625 ?ctryCoord }
-  BIND(COALESCE(?directCoord, ?locCoord, ?ctryCoord) AS ?rawCoord)
+  OPTIONAL { ?entity wdt:P276 ?loc        . ?loc        wdt:P625 ?locCoord    }
+  OPTIONAL { ?entity wdt:P17  ?ctry       . ?ctry       wdt:P625 ?ctryCoord   }
+  OPTIONAL { ?entity wdt:P19  ?birthPlace . ?birthPlace wdt:P625 ?birthCoord  }
+  OPTIONAL { ?entity wdt:P495 ?originCtry . ?originCtry wdt:P625 ?originCoord }
+  BIND(COALESCE(?directCoord, ?locCoord, ?ctryCoord, ?birthCoord, ?originCoord) AS ?rawCoord)
   FILTER(BOUND(?rawCoord))
 
   # ── Labels ─────────────────────────────────────────────────────────────────
@@ -145,10 +198,9 @@ LIMIT 300`.trim();
 
       const meta = typeIri ? typeMeta.get(typeIri) : undefined;
 
-      // Parse endYear from an xsd:dateTime string like "1830-01-01T00:00:00Z"
+      // Parse endYear — handles both CE and BCE dates (e.g. "-0048-01-01T00:00:00Z").
       // Undefined means still active (no end date recorded).
-      const endDateStr = b.endDate?.value;
-      const endYearRaw = endDateStr ? parseInt(endDateStr.slice(0, 4), 10) : undefined;
+      const endYearRaw = parseYearStr(b.endDate?.value);
 
       entities.push({
         iri,
