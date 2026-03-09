@@ -15,6 +15,8 @@ type MapProps = {
   owidDataset?: string;
   wikidataEntities?: WikidataMapEntity[];
   showCShapes?: boolean;
+  showHistoricalCountries?: boolean;
+  onHistoricalCountriesLoading?: (loading: boolean) => void;
   onParticipationClick?: (participation: WarParticipation) => void;
   onCountryClick?: (country: CShapesCountry) => void;
   onWikidataEntityClick?: (iri: string) => void;
@@ -27,6 +29,8 @@ export function Map({
   owidDataset,
   wikidataEntities,
   showCShapes = true,
+  showHistoricalCountries = true,
+  onHistoricalCountriesLoading,
   onParticipationClick,
   onCountryClick,
   onWikidataEntityClick,
@@ -40,6 +44,8 @@ export function Map({
     owidDataset,
     wikidataEntities,
     showCShapes,
+    showHistoricalCountries,
+    onHistoricalCountriesLoading,
     onParticipationClick,
     onCountryClick,
     onWikidataEntityClick,

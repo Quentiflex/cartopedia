@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, useTransition } from "react";
 import { CountryDetailPanel } from "./CountryDetailPanel";
 import { EntityDetailPanel } from "./EntityDetailPanel";
+import { EntitySearch } from "./EntitySearch";
 import { GanttChart } from "./GanttChart";
 import { Map } from "./Map";
 import { Timeline, type TimeWindow } from "./Timeline";
@@ -64,6 +65,8 @@ export function HomeClient({
   initialEntityId,
 }: HomeClientProps) {
   const router = useRouter();
+  const [timeWindowPending, startTimeWindowTransition] = useTransition();
+  const [countriesLoading, setCountriesLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] =
     useState<CShapesCountry | null>(null);
   const [selectedEntity, setSelectedEntity] = useState<EntityInstance | null>(null);
@@ -232,12 +235,14 @@ export function HomeClient({
   }, []);
 
   const handleTimeWindowChange = (window: TimeWindow) => {
-    router.push(buildSearchParams({
-      start: window.start,
-      end: window.end,
-      view: viewMode,
-      entity: wikidataEntityIri ? qidFromIri(wikidataEntityIri) : null,
-    }));
+    startTimeWindowTransition(() => {
+      router.push(buildSearchParams({
+        start: window.start,
+        end: window.end,
+        view: viewMode,
+        entity: wikidataEntityIri ? qidFromIri(wikidataEntityIri) : null,
+      }));
+    });
   };
 
   const handleViewModeChange = (view: ViewMode) => {
@@ -310,6 +315,8 @@ export function HomeClient({
           owidDataset={owidDataset}
           wikidataEntities={focusedMapEntities}
           showCShapes={false}
+          showHistoricalCountries={true}
+          onHistoricalCountriesLoading={setCountriesLoading}
           onParticipationClick={(p) => {
             handleParticipationClick(p);
             setSelectedCountry(null);
@@ -504,6 +511,7 @@ export function HomeClient({
             )}
           </button>
         )}
+        <EntitySearch onSelect={navigateToWikidataEntity} />
         <Link
           href="/ontology"
           className="rounded-lg border border-zinc-600 bg-zinc-800/90 p-2 text-zinc-400 hover:bg-zinc-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -557,7 +565,7 @@ export function HomeClient({
         {/* Country fill hidden while CShapes layer is disabled */}
       </header>
       <div className="absolute bottom-0 left-0 right-0 z-20 flex justify-center px-4 pb-6">
-        <Timeline window={timeWindow} onWindowChange={handleTimeWindowChange} />
+        <Timeline window={timeWindow} onWindowChange={handleTimeWindowChange} loading={timeWindowPending || countriesLoading} />
       </div>
     </div>
   );

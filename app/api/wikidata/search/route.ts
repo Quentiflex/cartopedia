@@ -1,25 +1,63 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchLive } from "@/lib/wikidata-live";
+
+const WD_API = "https://www.wikidata.org/w/api.php";
+const USER_AGENT = "Cartopedia/1.0 (personal history explorer; https://github.com/cartopedia)";
+
+export type SearchResult = {
+  id: string;
+  iri: string;
+  label: string;
+  description?: string;
+};
 
 /**
- * GET /api/wikidata/search?q=<text>&limit=20
+ * GET /api/wikidata/search?q=<query>
  *
- * Searches the live Wikidata Query Service for entities matching a text string.
- * The `source` parameter is accepted but ignored — live is always used.
+ * Proxies to Wikidata's wbsearchentities API and returns up to 10 matching entities.
  */
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (q.length < 2) {
-    return NextResponse.json({ error: "Query must be at least 2 characters" }, { status: 400 });
+    return NextResponse.json({ results: [] });
   }
 
-  const limit = Math.min(parseInt(request.nextUrl.searchParams.get("limit") ?? "20", 10) || 20, 50);
+  const url = new URL(WD_API);
+  url.searchParams.set("action", "wbsearchentities");
+  url.searchParams.set("search", q);
+  url.searchParams.set("language", "en");
+  url.searchParams.set("uselang", "en");
+  url.searchParams.set("limit", "10");
+  url.searchParams.set("format", "json");
 
   try {
-    const results = await searchLive(q, limit);
-    return NextResponse.json({ results, source: "live" });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8_000);
+    const res = await fetch(url.toString(), {
+      headers: { "User-Agent": USER_AGENT },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      return NextResponse.json({ error: `Wikidata API ${res.status}` }, { status: 502 });
+    }
+
+    type WdResult = { id: string; label?: string; description?: string };
+    const json = await res.json() as { search: WdResult[] };
+
+    const results: SearchResult[] = (json.search ?? []).map((r) => ({
+      id: r.id,
+      iri: `http://www.wikidata.org/entity/${r.id}`,
+      label: r.label ?? r.id,
+      description: r.description,
+    }));
+
+    return NextResponse.json(
+      { results },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    );
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Live search error";
-    return NextResponse.json({ error: message }, { status: 502 });
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: msg }, { status: 502 });
   }
 }

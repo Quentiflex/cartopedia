@@ -25,11 +25,16 @@ const LAYER_LABELS_ID = "war-participants-labels";
 const SOURCE_WIKIDATA = "wikidata-overlay";
 const LAYER_WIKIDATA_CIRCLES = "wikidata-overlay-circles";
 const LAYER_WIKIDATA_LABELS = "wikidata-overlay-labels";
+const SOURCE_HIST_COUNTRIES = "historical-countries";
+const LAYER_HIST_COUNTRIES_FILL = "historical-countries-fill";
+const LAYER_HIST_COUNTRIES_LINE = "historical-countries-line";
 
 const PARTICIPANT_COLOR = "#f59e0b";
 const LABEL_COLOR = "#fef3c7";
 const CSHAPES_FILL = "rgba(59, 130, 246, 0.2)";
 const CSHAPES_LINE = "rgba(59, 130, 246, 0.6)";
+const HIST_COUNTRIES_FILL = "rgba(34, 197, 94, 0.15)";
+const HIST_COUNTRIES_LINE = "rgba(34, 197, 94, 0.7)";
 
 function escapeHtml(s: string): string {
   return s
@@ -80,6 +85,10 @@ type UseMapLibreOptions = {
   wikidataEntities?: WikidataMapEntity[];
   /** Show the CShapes political boundaries layer (default true). */
   showCShapes?: boolean;
+  /** Show historical country boundaries from the PostgreSQL DB (default true). */
+  showHistoricalCountries?: boolean;
+  /** Called with true when a countries fetch starts, false when it finishes. */
+  onHistoricalCountriesLoading?: (loading: boolean) => void;
   onParticipationClick?: (participation: WarParticipation) => void;
   onCountryClick?: (country: CShapesCountry) => void;
   onWikidataEntityClick?: (iri: string) => void;
@@ -139,7 +148,7 @@ function wikidataToGeoJSON(
  */
 export function useMapLibre(
   containerRef: React.RefObject<HTMLDivElement | null>,
-  { participations, timeWindow, fillMode = "default", owidDataset, wikidataEntities, showCShapes = true, onParticipationClick, onCountryClick, onWikidataEntityClick }: UseMapLibreOptions
+  { participations, timeWindow, fillMode = "default", owidDataset, wikidataEntities, showCShapes = true, showHistoricalCountries = true, onHistoricalCountriesLoading, onParticipationClick, onCountryClick, onWikidataEntityClick }: UseMapLibreOptions
 ) {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const sourceAddedRef = useRef(false);
@@ -153,6 +162,7 @@ export function useMapLibre(
   const owidDatasetRef = useRef(owidDataset);
   const wikidataEntitiesRef = useRef(wikidataEntities);
   const showCShapesRef = useRef(showCShapes);
+  const showHistoricalCountriesRef = useRef(showHistoricalCountries);
 
   participationsRef.current = participations;
   onParticipationClickRef.current = onParticipationClick;
@@ -163,6 +173,9 @@ export function useMapLibre(
   owidDatasetRef.current = owidDataset;
   wikidataEntitiesRef.current = wikidataEntities;
   showCShapesRef.current = showCShapes;
+  showHistoricalCountriesRef.current = showHistoricalCountries;
+  const onHistoricalCountriesLoadingRef = useRef(onHistoricalCountriesLoading);
+  onHistoricalCountriesLoadingRef.current = onHistoricalCountriesLoading;
 
   // Initialize map once
   useEffect(() => {
@@ -409,6 +422,96 @@ export function useMapLibre(
         if (country) cb(country);
       });
 
+      // ── Historical countries from PostgreSQL DB ──────────────────────────────
+      map.addSource(SOURCE_HIST_COUNTRIES, { type: "geojson", data: emptyGeoJSON });
+
+      map.addLayer({
+        id: LAYER_HIST_COUNTRIES_FILL,
+        type: "fill",
+        source: SOURCE_HIST_COUNTRIES,
+        paint: {
+          "fill-color": HIST_COUNTRIES_FILL,
+          "fill-outline-color": HIST_COUNTRIES_LINE,
+        },
+      });
+
+      map.addLayer({
+        id: LAYER_HIST_COUNTRIES_LINE,
+        type: "line",
+        source: SOURCE_HIST_COUNTRIES,
+        paint: {
+          "line-color": HIST_COUNTRIES_LINE,
+          "line-width": 1.5,
+        },
+      });
+
+      // Add a hover popup showing the country name
+      const histPopup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        className: "cartopedia-hover-popup",
+      });
+      const showHistPopup = (e: maplibregl.MapLayerMouseEvent) => {
+        const features = map.queryRenderedFeatures(e.point, { layers: [LAYER_HIST_COUNTRIES_FILL] });
+        if (features.length === 0) return;
+        const names = [
+          ...new Set(
+            features
+              .map((f) => {
+                const p = f.properties as Record<string, unknown>;
+                return typeof p.name === "string" ? p.name : null;
+              })
+              .filter((n): n is string => n !== null)
+          ),
+        ];
+        const html = names.map((n) => `<strong>${escapeHtml(n)}</strong>`).join("<br/>");
+        histPopup.setLngLat(e.lngLat).setHTML(html).addTo(map);
+      };
+
+      map.on("mouseenter", LAYER_HIST_COUNTRIES_FILL, (e) => {
+        map.getCanvas().style.cursor = "pointer";
+        showHistPopup(e);
+      });
+      map.on("mousemove", LAYER_HIST_COUNTRIES_FILL, (e) => {
+        showHistPopup(e);
+      });
+      map.on("mouseleave", LAYER_HIST_COUNTRIES_FILL, () => {
+        map.getCanvas().style.cursor = "";
+        histPopup.remove();
+      });
+      map.on("click", LAYER_HIST_COUNTRIES_FILL, (e) => {
+        const cb = onWikidataEntityClickRef.current;
+        if (!cb || !e.features?.[0]?.properties) return;
+        const props = e.features[0].properties as Record<string, unknown>;
+        const qid = typeof props.wikidata_id === "string" ? props.wikidata_id : null;
+        if (qid) cb(`http://www.wikidata.org/entity/${qid}`);
+      });
+
+      if (showHistoricalCountriesRef.current) {
+        const { end } = timeWindowRef.current;
+        const src = map.getSource(SOURCE_HIST_COUNTRIES) as maplibregl.GeoJSONSource | undefined;
+        if (src) {
+          onHistoricalCountriesLoadingRef.current?.(true);
+          fetch(`/api/countries?year=${end}`)
+            .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.statusText))))
+            .then((data: GeoJSON.FeatureCollection) => src.setData(data))
+            .catch(() => src.setData(emptyGeoJSON))
+            .finally(() => onHistoricalCountriesLoadingRef.current?.(false));
+        }
+      }
+
+      // Ensure event and Wikidata overlays render above country polygons
+      for (const layerId of [
+        LAYER_CIRCLES_ID,
+        LAYER_LABELS_ID,
+        LAYER_WIKIDATA_CIRCLES,
+        LAYER_WIKIDATA_LABELS,
+      ]) {
+        if (map.getLayer(layerId)) {
+          map.moveLayer(layerId);
+        }
+      }
+
       sourceAddedRef.current = true;
     });
 
@@ -498,6 +601,23 @@ export function useMapLibre(
         map.setPaintProperty(LAYER_CSHAPES_FILL_ID, "fill-color", CSHAPES_FILL);
       });
   }, [timeWindow, fillMode, owidDataset]);
+
+  // Refresh historical countries when the chosen year (end) changes
+  useEffect(() => {
+    if (!showHistoricalCountries) return;
+    const map = mapRef.current;
+    if (!map || !sourceAddedRef.current) return;
+    const src = map.getSource(SOURCE_HIST_COUNTRIES) as maplibregl.GeoJSONSource | undefined;
+    if (!src) return;
+    const { end } = timeWindow;
+    onHistoricalCountriesLoadingRef.current?.(true);
+    fetch(`/api/countries?year=${end}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.statusText))))
+      .then((data: GeoJSON.FeatureCollection) => src.setData(data))
+      .catch(() => src.setData(emptyGeoJSON))
+      .finally(() => onHistoricalCountriesLoadingRef.current?.(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeWindow.end, showHistoricalCountries]);
 
   return mapRef;
 }

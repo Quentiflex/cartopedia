@@ -1,113 +1,93 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTimelinePlayback } from "@/lib/hooks/useTimelinePlayback";
 
 const YEAR_MIN = -1000;
 const YEAR_MAX = new Date().getFullYear();
+const DEFAULT_MEMORY = 50;
 
 export type TimeWindow = { start: number; end: number };
 
 type TimelineProps = {
   window: TimeWindow;
   onWindowChange: (window: TimeWindow) => void;
+  loading?: boolean;
 };
 
 function clampYear(year: number): number {
   return Math.max(YEAR_MIN, Math.min(YEAR_MAX, year));
 }
 
-export function Timeline({ window, onWindowChange }: TimelineProps) {
-  const [inputStart, setInputStart] = useState(String(window.start));
-  const [inputEnd, setInputEnd] = useState(String(window.end));
 
-  const windowStart = clampYear(window.start);
-  const windowEnd = clampYear(window.end);
-  const windowSize = windowEnd - windowStart + 1;
+export function Timeline({ window, onWindowChange, loading = false }: TimelineProps) {
+  // Current year = window.end; memory window = how many years before it
+  const currentYear = window.end;
+  const memoryYears = Math.max(0, window.end - window.start);
 
-  // Sync inputs when window is changed externally (e.g. by play)
+  const [inputYear, setInputYear] = useState(String(currentYear));
+  const [inputMemory, setInputMemory] = useState(String(memoryYears));
+
+  // Sync inputs when window changes externally (e.g. URL navigation)
   useEffect(() => {
-    setInputStart(String(windowStart));
-    setInputEnd(String(windowEnd));
-  }, [windowStart, windowEnd]);
+    setInputYear(String(window.end));
+    setInputMemory(String(Math.max(0, window.end - window.start)));
+  }, [window.end, window.start]);
 
-  const handleNext = useCallback(() => {
-    const nextStart = clampYear(windowStart + 1);
-    onWindowChange({ start: nextStart, end: clampYear(nextStart + windowSize - 1) });
-  }, [windowStart, windowSize, onWindowChange]);
-
-  const { isPlaying, setIsPlaying, canPlay } = useTimelinePlayback({
-    currentStart: windowStart,
-    maxStart: YEAR_MAX - 1,
-    onNext: handleNext,
-  });
-
-  const handleConfirm = useCallback(() => {
-    const s = parseInt(inputStart, 10);
-    const e = parseInt(inputEnd, 10);
-    if (!Number.isNaN(s) && !Number.isNaN(e) && s <= e) {
-      onWindowChange({ start: clampYear(s), end: clampYear(e) });
-    }
-  }, [inputStart, inputEnd, onWindowChange]);
+  const handleSet = useCallback(() => {
+    const year = parseInt(inputYear, 10);
+    const memory = parseInt(inputMemory, 10);
+    if (Number.isNaN(year)) return;
+    const safeMemory = Number.isNaN(memory) || memory < 0 ? DEFAULT_MEMORY : memory;
+    onWindowChange({
+      start: clampYear(year - safeMemory),
+      end: clampYear(year),
+    });
+  }, [inputYear, inputMemory, onWindowChange]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") handleConfirm();
+      if (e.key === "Enter") handleSet();
     },
-    [handleConfirm]
+    [handleSet]
   );
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-zinc-900/95 px-5 py-3 shadow-xl backdrop-blur">
+    <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-zinc-900/95 px-5 py-3 shadow-xl backdrop-blur">
+      <label className="text-xs text-zinc-400">Year</label>
+      <input
+        type="number"
+        value={inputYear}
+        onChange={(e) => setInputYear(e.target.value)}
+        onKeyDown={handleKeyDown}
+        className="w-24 rounded-lg border border-white/20 bg-zinc-800 px-2 py-1.5 font-mono text-sm text-white focus:border-amber-500/60 focus:outline-none"
+        aria-label="Current year"
+      />
+      <span className="text-zinc-600">·</span>
+      <label className="text-xs text-zinc-400">Memory</label>
+      <input
+        type="number"
+        value={inputMemory}
+        onChange={(e) => setInputMemory(e.target.value)}
+        onKeyDown={handleKeyDown}
+        min={0}
+        className="w-20 rounded-lg border border-white/20 bg-zinc-800 px-2 py-1.5 font-mono text-sm text-white focus:border-amber-500/60 focus:outline-none"
+        aria-label="Memory window in years"
+      />
+      <span className="text-xs text-zinc-500">yrs</span>
       <button
         type="button"
-        onClick={() => setIsPlaying((p) => !p)}
-        disabled={!canPlay && !isPlaying}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border-2 border-amber-500/60 bg-amber-500/20 text-amber-400 transition hover:bg-amber-500/30 disabled:opacity-40 disabled:hover:bg-amber-500/20"
-        aria-label={isPlaying ? "Pause" : "Play"}
+        onClick={handleSet}
+        disabled={loading}
+        className="flex items-center gap-1.5 rounded-lg border border-amber-500/60 bg-amber-500/20 px-3 py-1.5 text-sm font-medium text-amber-400 transition hover:bg-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPlaying ? (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <rect x="6" y="4" width="4" height="16" rx="1" />
-            <rect x="14" y="4" width="4" height="16" rx="1" />
-          </svg>
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <path d="M8 5v14l11-7z" />
+        {loading && (
+          <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
         )}
+        {loading ? "Loading…" : "Set"}
       </button>
-
-      <span className="rounded-lg border-2 border-amber-500/60 bg-amber-500/15 px-4 py-1.5 font-mono text-base font-semibold tabular-nums text-amber-400">
-        {windowStart} – {windowEnd}
-      </span>
-
-      <div className="flex items-center gap-2">
-        <input
-          type="number"
-          value={inputStart}
-          onChange={(e) => setInputStart(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="w-24 rounded-lg border border-white/20 bg-zinc-800 px-2 py-1.5 font-mono text-sm text-white focus:border-amber-500/60 focus:outline-none"
-          aria-label="Start year"
-        />
-        <span className="text-xs text-white/40">to</span>
-        <input
-          type="number"
-          value={inputEnd}
-          onChange={(e) => setInputEnd(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="w-24 rounded-lg border border-white/20 bg-zinc-800 px-2 py-1.5 font-mono text-sm text-white focus:border-amber-500/60 focus:outline-none"
-          aria-label="End year"
-        />
-        <button
-          type="button"
-          onClick={handleConfirm}
-          className="rounded-lg border border-amber-500/60 bg-amber-500/20 px-3 py-1.5 text-sm text-amber-400 transition hover:bg-amber-500/30"
-        >
-          Set
-        </button>
-      </div>
     </div>
   );
 }

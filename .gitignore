@@ -17,6 +17,7 @@
 /.next/
 /out/
 
+/ohm_tiles/*
 # production
 /build
 

@@ -1,7 +1,8 @@
 import { HomeClient } from "@/components/client/HomeClient";
 
-const DEFAULT_START = 1820;
-const DEFAULT_END = 1830;
+// Default: year 1500, with a 50-year memory window (events from 1450–1500)
+const DEFAULT_END = 1500;
+const DEFAULT_START = DEFAULT_END - 50;
 const YEAR_MIN = -1000;
 const YEAR_MAX = new Date().getFullYear();
 
