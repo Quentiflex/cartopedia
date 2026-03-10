@@ -21,6 +21,7 @@ const LAYER_CSHAPES_FILL_ID = "cshapes-fill";
 const LAYER_CSHAPES_LINE_ID = "cshapes-line";
 const SOURCE_ID = "war-participants";
 const LAYER_CIRCLES_ID = "war-participants-circles";
+const LAYER_CIRCLES_COUNT_ID = "war-participants-count";
 const LAYER_LABELS_ID = "war-participants-labels";
 const SOURCE_WIKIDATA = "wikidata-overlay";
 const LAYER_WIKIDATA_CIRCLES = "wikidata-overlay-circles";
@@ -137,6 +138,7 @@ function wikidataToGeoJSON(
         typeLabel: e.typeLabel,
         color: categoryColor(e.typeIri),
         opacity: entityOpacity(e.endYear, timeWindow),
+        endYear: e.endYear ?? null,
       },
     })),
   };
@@ -283,6 +285,26 @@ export function useMapLibre(
         },
       });
       
+      // Count badge: shown on top of circles when multiple events share the same spot
+      map.addLayer({
+        id: LAYER_CIRCLES_COUNT_ID,
+        type: "symbol",
+        source: SOURCE_ID,
+        filter: [">", ["get", "stackCount"], 1],
+        layout: {
+          "text-field": ["to-string", ["get", "stackCount"]],
+          "text-size": 10,
+          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-allow-overlap": true,
+          "text-ignore-placement": true,
+        },
+        paint: {
+          "text-color": "#1c1917",
+          "text-halo-color": "#f59e0b",
+          "text-halo-width": 1,
+        },
+      });
+
       map.addLayer({
         id: LAYER_LABELS_ID,
         type: "symbol",
@@ -349,33 +371,135 @@ export function useMapLibre(
         },
       });
 
-      map.on("mouseenter", LAYER_WIKIDATA_CIRCLES, () => {
+      // Wikidata overlay hover tooltip
+      const wikidataPopup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        className: "cartopedia-hover-popup",
+      });
+
+      const showWikidataPopup = (e: maplibregl.MapLayerMouseEvent) => {
+        // Use queryRenderedFeatures so ordering is consistent with the click handler.
+        // De-duplicate by IRI in case the same feature appears multiple times.
+        const features = map.queryRenderedFeatures(e.point, { layers: [LAYER_WIKIDATA_CIRCLES] });
+        const seen = new Set<string>();
+        const rows: string[] = [];
+
+        for (const f of features) {
+          const props = (f.properties ?? {}) as {
+            iri?: string; label?: string; typeLabel?: string;
+            description?: string; endYear?: number | null;
+          };
+          const iri = props.iri ?? "";
+          if (seen.has(iri)) continue;
+          seen.add(iri);
+
+          const label = props.label ?? "";
+          const typeLabel = props.typeLabel ?? "";
+          const description = props.description ?? "";
+          const endYear = typeof props.endYear === "number" ? props.endYear : null;
+
+          const secondaryParts: string[] = [];
+          if (typeLabel) secondaryParts.push(escapeHtml(typeLabel));
+          if (endYear !== null) secondaryParts.push(`ended ${endYear}`);
+          const secondary = secondaryParts.join(" · ");
+
+          rows.push(
+            `<div style="margin:2px 0"><strong>${escapeHtml(label)}</strong>` +
+            (secondary ? `<br/><span style="color:#a1a1aa;font-size:0.85em">${secondary}</span>` : "") +
+            (description ? `<br/><span style="color:#d4d4d8;font-size:0.8em">${escapeHtml(description)}</span>` : "") +
+            `</div>`
+          );
+        }
+
+        if (!rows.length) return;
+
+        const header = rows.length > 1
+          ? `<div style="color:#a1a1aa;font-size:0.8em;margin-bottom:6px">${rows.length} events at this location</div>`
+          : "";
+
+        wikidataPopup
+          .setLngLat(e.lngLat)
+          .setHTML(header + rows.join("<hr style='border-color:#3f3f46;margin:4px 0'/>"))
+          .addTo(map);
+      };
+
+      map.on("mouseenter", LAYER_WIKIDATA_CIRCLES, (e) => {
         map.getCanvas().style.cursor = "pointer";
+        showWikidataPopup(e);
+      });
+      map.on("mousemove", LAYER_WIKIDATA_CIRCLES, (e) => {
+        showWikidataPopup(e);
       });
       map.on("mouseleave", LAYER_WIKIDATA_CIRCLES, () => {
         map.getCanvas().style.cursor = "";
-      });
-      map.on("click", LAYER_WIKIDATA_CIRCLES, (e) => {
-        const cb = onWikidataEntityClickRef.current;
-        if (!cb || !e.features?.[0]?.properties) return;
-        const { iri } = e.features[0].properties as { iri?: string };
-        if (iri) cb(iri);
+        wikidataPopup.remove();
       });
 
-      // Participation circles hover and click
-      map.on("mouseenter", LAYER_CIRCLES_ID, () => {
+      // Participation circles hover tooltip
+      const participationPopup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        className: "cartopedia-hover-popup",
+      });
+
+      const getParticipationsAtPoint = (point: maplibregl.Point): WarParticipation[] => {
+        const features = map.queryRenderedFeatures(point, { layers: [LAYER_CIRCLES_ID] });
+        const indices = [
+          ...new Set(
+            features
+              .map((f) => {
+                const p = f.properties as { index?: unknown } | undefined;
+                return typeof p?.index === "number" ? p.index : null;
+              })
+              .filter((v): v is number => v !== null)
+          ),
+        ];
+        return indices
+          .map((idx) => participationsRef.current[idx])
+          .filter((p): p is WarParticipation => !!p);
+      };
+
+      const showParticipationPopup = (e: maplibregl.MapLayerMouseEvent) => {
+        const participationsAtPoint = getParticipationsAtPoint(e.point);
+        if (!participationsAtPoint.length) return;
+
+        const warRows: string[] = [];
+        for (const part of participationsAtPoint) {
+          for (const war of part.wars) {
+            const startYear = war.startDate?.split("-")[0] ?? "";
+            const endYear = war.endDate?.split("-")[0] ?? "";
+            const dateStr = endYear && endYear !== startYear
+              ? `${startYear} – ${endYear}`
+              : startYear;
+            warRows.push(
+              `<div style="margin:2px 0"><strong>${escapeHtml(war.label)}</strong>` +
+              (dateStr ? `<br/><span style="color:#a1a1aa;font-size:0.85em">${escapeHtml(dateStr)}</span>` : "") +
+              `</div>`
+            );
+          }
+        }
+
+        const header = participationsAtPoint.length > 1
+          ? `<div style="color:#a1a1aa;font-size:0.8em;margin-bottom:6px">${participationsAtPoint.length} events at this location</div>`
+          : "";
+
+        participationPopup
+          .setLngLat(e.lngLat)
+          .setHTML(header + warRows.join("<hr style='border-color:#3f3f46;margin:4px 0'/>"))
+          .addTo(map);
+      };
+
+      map.on("mouseenter", LAYER_CIRCLES_ID, (e) => {
         map.getCanvas().style.cursor = "pointer";
+        showParticipationPopup(e);
+      });
+      map.on("mousemove", LAYER_CIRCLES_ID, (e) => {
+        showParticipationPopup(e);
       });
       map.on("mouseleave", LAYER_CIRCLES_ID, () => {
         map.getCanvas().style.cursor = "";
-      });
-      map.on("click", LAYER_CIRCLES_ID, (e) => {
-        const cb = onParticipationClickRef.current;
-        if (!cb || !e.features?.[0]?.properties) return;
-        const p = e.features[0].properties as { index?: number };
-        const idx = typeof p.index === "number" ? p.index : -1;
-        const part = participationsRef.current[idx];
-        if (part) cb(part);
+        participationPopup.remove();
       });
 
       // CShapes hover: show value tooltip when in choropleth mode
@@ -384,10 +508,7 @@ export function useMapLibre(
         closeOnClick: false,
         className: "cartopedia-hover-popup",
       });
-      const showHoverPopup = (e: maplibregl.MapLayerMouseEvent) => {
-        const f = e.features?.[0];
-        if (!f?.properties) return;
-        const props = f.properties as Record<string, unknown>;
+      const showHoverPopup = (lngLat: maplibregl.LngLat, props: Record<string, unknown>) => {
         const name = (typeof props.cntry_name === "string" ? props.cntry_name : "") || "Unknown";
         const raw = props.value;
         const value =
@@ -400,26 +521,22 @@ export function useMapLibre(
                   ? String(raw)
                   : raw.toFixed(2)
             : "—";
-        hoverPopup.setLngLat(e.lngLat).setHTML(`<strong>${escapeHtml(name)}</strong><br/>${escapeHtml(value)}`).addTo(map);
+        hoverPopup.setLngLat(lngLat).setHTML(`<strong>${escapeHtml(name)}</strong><br/>${escapeHtml(value)}`).addTo(map);
       };
       map.on("mouseenter", LAYER_CSHAPES_FILL_ID, (e) => {
+        if (map.queryRenderedFeatures(e.point, { layers: [LAYER_CIRCLES_ID, LAYER_WIKIDATA_CIRCLES] }).length) return;
         map.getCanvas().style.cursor = "pointer";
-        if (fillModeRef.current === "population") showHoverPopup(e);
+        const f = e.features?.[0];
+        if (f?.properties && fillModeRef.current === "population") showHoverPopup(e.lngLat, f.properties as Record<string, unknown>);
       });
       map.on("mousemove", LAYER_CSHAPES_FILL_ID, (e) => {
-        if (fillModeRef.current === "population") showHoverPopup(e);
+        if (map.queryRenderedFeatures(e.point, { layers: [LAYER_CIRCLES_ID, LAYER_WIKIDATA_CIRCLES] }).length) { hoverPopup.remove(); return; }
+        const f = e.features?.[0];
+        if (f?.properties && fillModeRef.current === "population") showHoverPopup(e.lngLat, f.properties as Record<string, unknown>);
       });
       map.on("mouseleave", LAYER_CSHAPES_FILL_ID, () => {
         map.getCanvas().style.cursor = "";
         hoverPopup.remove();
-      });
-      map.on("click", LAYER_CSHAPES_FILL_ID, (e) => {
-        const cb = onCountryClickRef.current;
-        if (!cb || !e.features?.[0]?.properties) return;
-        const country = featureToCountry(
-          e.features[0].properties as Record<string, unknown>
-        );
-        if (country) cb(country);
       });
 
       // ── Historical countries from PostgreSQL DB ──────────────────────────────
@@ -452,6 +569,9 @@ export function useMapLibre(
         className: "cartopedia-hover-popup",
       });
       const showHistPopup = (e: maplibregl.MapLayerMouseEvent) => {
+        // Let event/wikidata tooltips win.
+        const overPoints = map.queryRenderedFeatures(e.point, { layers: [LAYER_CIRCLES_ID, LAYER_WIKIDATA_CIRCLES] });
+        if (overPoints.length) { histPopup.remove(); return; }
         const features = map.queryRenderedFeatures(e.point, { layers: [LAYER_HIST_COUNTRIES_FILL] });
         if (features.length === 0) return;
         const names = [
@@ -469,6 +589,7 @@ export function useMapLibre(
       };
 
       map.on("mouseenter", LAYER_HIST_COUNTRIES_FILL, (e) => {
+        if (map.queryRenderedFeatures(e.point, { layers: [LAYER_CIRCLES_ID, LAYER_WIKIDATA_CIRCLES] }).length) return;
         map.getCanvas().style.cursor = "pointer";
         showHistPopup(e);
       });
@@ -479,12 +600,44 @@ export function useMapLibre(
         map.getCanvas().style.cursor = "";
         histPopup.remove();
       });
-      map.on("click", LAYER_HIST_COUNTRIES_FILL, (e) => {
-        const cb = onWikidataEntityClickRef.current;
-        if (!cb || !e.features?.[0]?.properties) return;
-        const props = e.features[0].properties as Record<string, unknown>;
-        const qid = typeof props.wikidata_id === "string" ? props.wikidata_id : null;
-        if (qid) cb(`http://www.wikidata.org/entity/${qid}`);
+
+      // ── Single unified click handler — priority: events > wikidata > hist countries > cshapes ──
+      map.on("click", (e) => {
+        // Priority 1: war event circles
+        const eventParticipations = getParticipationsAtPoint(e.point);
+        if (eventParticipations.length) {
+          const cb = onParticipationClickRef.current;
+          if (cb) cb(eventParticipations[0]);
+          return;
+        }
+
+        // Priority 2: wikidata overlay circles
+        const wikidataFeatures = map.queryRenderedFeatures(e.point, { layers: [LAYER_WIKIDATA_CIRCLES] });
+        if (wikidataFeatures.length) {
+          const cb = onWikidataEntityClickRef.current;
+          const { iri } = (wikidataFeatures[0].properties ?? {}) as { iri?: string };
+          if (cb && iri) cb(iri);
+          return;
+        }
+
+        // Priority 3: historical countries
+        const histFeatures = map.queryRenderedFeatures(e.point, { layers: [LAYER_HIST_COUNTRIES_FILL] });
+        if (histFeatures.length) {
+          const cb = onWikidataEntityClickRef.current;
+          const props = histFeatures[0].properties as Record<string, unknown>;
+          const qid = typeof props.wikidata_id === "string" ? props.wikidata_id : null;
+          if (cb && qid) cb(`http://www.wikidata.org/entity/${qid}`);
+          return;
+        }
+
+        // Priority 4: CShapes country polygons
+        const cshapesFeatures = map.queryRenderedFeatures(e.point, { layers: [LAYER_CSHAPES_FILL_ID] });
+        if (cshapesFeatures.length) {
+          const cb = onCountryClickRef.current;
+          const country = featureToCountry(cshapesFeatures[0].properties as Record<string, unknown>);
+          if (cb && country) cb(country);
+          return;
+        }
       });
 
       if (showHistoricalCountriesRef.current) {
@@ -503,6 +656,7 @@ export function useMapLibre(
       // Ensure event and Wikidata overlays render above country polygons
       for (const layerId of [
         LAYER_CIRCLES_ID,
+        LAYER_CIRCLES_COUNT_ID,
         LAYER_LABELS_ID,
         LAYER_WIKIDATA_CIRCLES,
         LAYER_WIKIDATA_LABELS,

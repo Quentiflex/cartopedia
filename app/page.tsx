@@ -15,7 +15,7 @@ function clampYear(year: number): number {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ start?: string; end?: string; view?: string; entity?: string }>;
+  searchParams: Promise<{ start?: string; end?: string; view?: string; entity?: string; overlay?: string }>;
 }) {
   const params = await searchParams;
   const startParam = params.start != null ? parseInt(params.start, 10) : DEFAULT_START;
@@ -31,6 +31,10 @@ export default async function Home({
   const entityId = typeof params.entity === "string" && params.entity.match(/^Q\d+$/)
     ? params.entity
     : undefined;
+  const initialOverlayTypes =
+    typeof params.overlay === "string" && params.overlay.length > 0
+      ? params.overlay.split(",")
+      : undefined;
 
   return (
     <HomeClient
@@ -39,6 +43,7 @@ export default async function Home({
       timeWindow={{ start, end }}
       viewMode={viewMode}
       initialEntityId={entityId}
+      initialOverlayTypes={initialOverlayTypes}
     />
   );
 }

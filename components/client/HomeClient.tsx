@@ -35,6 +35,8 @@ type HomeClientProps = {
   viewMode: ViewMode;
   /** Wikidata entity ID (e.g. "Q31") to open automatically on load. */
   initialEntityId?: string;
+  /** Initial Wikidata overlay types from the URL (?overlay=...) */
+  initialOverlayTypes?: string[];
 };
 
 const WD_BASE = "http://www.wikidata.org/entity/";
@@ -48,12 +50,14 @@ function buildSearchParams(params: {
   end: number;
   view: ViewMode;
   entity?: string | null;
+  overlay?: string | null;
 }): string {
   const sp = new URLSearchParams();
   sp.set("start", String(params.start));
   sp.set("end", String(params.end));
   sp.set("view", params.view);
   if (params.entity) sp.set("entity", params.entity);
+  if (params.overlay) sp.set("overlay", params.overlay);
   return "?" + sp.toString();
 }
 
@@ -63,6 +67,7 @@ export function HomeClient({
   timeWindow,
   viewMode,
   initialEntityId,
+  initialOverlayTypes,
 }: HomeClientProps) {
   const router = useRouter();
   const [timeWindowPending, startTimeWindowTransition] = useTransition();
@@ -78,21 +83,53 @@ export function HomeClient({
 
   // ── Wikidata overlay ──────────────────────────────────────────────────────
   const [overlayOpen, setOverlayOpen] = useState(false);
-  const [selectedTypeIris, setSelectedTypeIris] = useState<Set<string>>(new Set());
+  const [selectedTypeIris, setSelectedTypeIris] = useState<Set<string>>(
+    () => new Set(initialOverlayTypes ?? [])
+  );
   const [overlayEntities, setOverlayEntities] = useState<WikidataMapEntity[]>([]);
   const [overlayStatus, setOverlayStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [overlayError, setOverlayError] = useState<string | null>(null);
   const [fetchedWindow, setFetchedWindow] = useState<TimeWindow | null>(null);
   const overlayPanelRef = useRef<HTMLDivElement>(null);
 
+  const [wikidataEntity, setWikidataEntity] = useState<WikidataEntityDetail | null>(null);
+  const [wikidataEntityIri, setWikidataEntityIri] = useState<string | null>(null);
+  const [wikidataEntityLoading, setWikidataEntityLoading] = useState(false);
+  const [wikidataEntityError, setWikidataEntityError] = useState<string | null>(null);
+  const [wikidataEntityHistory, setWikidataEntityHistory] = useState<WikidataEntityDetail[]>([]);
+
   const isStale =
     fetchedWindow !== null &&
     (fetchedWindow.start !== timeWindow.start || fetchedWindow.end !== timeWindow.end);
 
+  const overlayParamFromSet = useCallback(
+    (set: Set<string>): string | null => (set.size ? [...set].join(",") : null),
+    []
+  );
+
+  const getOverlayParam = useCallback(
+    () => overlayParamFromSet(selectedTypeIris),
+    [overlayParamFromSet, selectedTypeIris]
+  );
+
   function toggleType(iri: string) {
     setSelectedTypeIris((prev) => {
       const next = new Set(prev);
-      next.has(iri) ? next.delete(iri) : next.add(iri);
+      if (next.has(iri)) {
+        next.delete(iri);
+      } else {
+        next.add(iri);
+      }
+      const overlay = overlayParamFromSet(next);
+      router.push(
+        buildSearchParams({
+          start: timeWindow.start,
+          end: timeWindow.end,
+          view: viewMode,
+          entity: wikidataEntityIri ? qidFromIri(wikidataEntityIri) : null,
+          overlay,
+        })
+      );
       return next;
     });
   }
@@ -126,12 +163,6 @@ export function HomeClient({
   }, {});
 
   // ── Wikidata entity detail (map marker click) ─────────────────────────────
-  const [wikidataEntity, setWikidataEntity] = useState<WikidataEntityDetail | null>(null);
-  const [wikidataEntityIri, setWikidataEntityIri] = useState<string | null>(null);
-  const [wikidataEntityLoading, setWikidataEntityLoading] = useState(false);
-  const [wikidataEntityError, setWikidataEntityError] = useState<string | null>(null);
-  const [wikidataEntityHistory, setWikidataEntityHistory] = useState<WikidataEntityDetail[]>([]);
-
   /** Related events fetched for the currently open entity — shown as map markers. */
   const [relatedEventEntities, setRelatedEventEntities] = useState<WikidataMapEntity[]>([]);
 
@@ -175,7 +206,15 @@ export function HomeClient({
     setWikidataEntityError(null);
     setWikidataEntityLoading(true);
     if (!opts?.skipUrlPush) {
-      router.push(buildSearchParams({ start: timeWindow.start, end: timeWindow.end, view: viewMode, entity: qidFromIri(iri) }));
+      router.push(
+        buildSearchParams({
+          start: timeWindow.start,
+          end: timeWindow.end,
+          view: viewMode,
+          entity: qidFromIri(iri),
+          overlay: getOverlayParam(),
+        })
+      );
     }
     try {
       const r = await fetch(`/api/wikidata/entity?iri=${encodeURIComponent(iri)}&source=live`);
@@ -195,7 +234,14 @@ export function HomeClient({
     setWikidataEntityError(null);
     setWikidataEntityHistory([]);
     setRelatedEventEntities([]);
-    router.push(buildSearchParams({ start: timeWindow.start, end: timeWindow.end, view: viewMode }));
+    router.push(
+      buildSearchParams({
+        start: timeWindow.start,
+        end: timeWindow.end,
+        view: viewMode,
+        overlay: getOverlayParam(),
+      })
+    );
   };
 
   const goBackWikidata = () => {
@@ -206,7 +252,15 @@ export function HomeClient({
     setWikidataEntityIri(prev.iri);
     setWikidataEntityError(null);
     // Replace (not push) so the browser back button is not confused
-    router.replace(buildSearchParams({ start: timeWindow.start, end: timeWindow.end, view: viewMode, entity: qidFromIri(prev.iri) }));
+    router.replace(
+      buildSearchParams({
+        start: timeWindow.start,
+        end: timeWindow.end,
+        view: viewMode,
+        entity: qidFromIri(prev.iri),
+        overlay: getOverlayParam(),
+      })
+    );
   };
 
   // Open entity panel from URL on initial page load (e.g. shared link or bookmark)
@@ -236,22 +290,28 @@ export function HomeClient({
 
   const handleTimeWindowChange = (window: TimeWindow) => {
     startTimeWindowTransition(() => {
-      router.push(buildSearchParams({
-        start: window.start,
-        end: window.end,
-        view: viewMode,
-        entity: wikidataEntityIri ? qidFromIri(wikidataEntityIri) : null,
-      }));
+      router.push(
+        buildSearchParams({
+          start: window.start,
+          end: window.end,
+          view: viewMode,
+          entity: wikidataEntityIri ? qidFromIri(wikidataEntityIri) : null,
+          overlay: getOverlayParam(),
+        })
+      );
     });
   };
 
   const handleViewModeChange = (view: ViewMode) => {
-    router.push(buildSearchParams({
-      start: timeWindow.start,
-      end: timeWindow.end,
-      view,
-      entity: wikidataEntityIri ? qidFromIri(wikidataEntityIri) : null,
-    }));
+    router.push(
+      buildSearchParams({
+        start: timeWindow.start,
+        end: timeWindow.end,
+        view,
+        entity: wikidataEntityIri ? qidFromIri(wikidataEntityIri) : null,
+        overlay: getOverlayParam(),
+      })
+    );
   };
 
   // Fetch entity details by IRI and navigate to it
