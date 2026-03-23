@@ -547,6 +547,22 @@ export function HomeClient({
         >
           Wikidata
         </Link>
+        <Link
+          href="/discipline-browser"
+          className="rounded-lg border border-zinc-600 bg-zinc-800/90 px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-zinc-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+          title="Browse concept neighborhoods"
+          aria-label="Browse concept neighborhoods"
+        >
+          Concept Graph
+        </Link>
+        <Link
+          href="/discipline-evolution"
+          className="rounded-lg border border-zinc-600 bg-zinc-800/90 px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-zinc-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+          title="Discipline evolution (Gantt)"
+          aria-label="Discipline evolution (Gantt)"
+        >
+          Discipline Evolution
+        </Link>
         {viewMode === "map" && (
           <button
             type="button"

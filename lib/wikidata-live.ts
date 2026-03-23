@@ -320,3 +320,160 @@ LIMIT 1`.trim();
 
   return { label, description, wikiSummary, properties, incomingRelations };
 }
+
+export type NeighborhoodNode = {
+  iri: string;
+  label: string;
+  via?: {
+    propertyIri: string;
+    propertyLabel: string;
+  };
+};
+
+export type RelationNeighborhoodResponse = {
+  focus: { iri: string; label: string; description?: string };
+  relation: { code: string; label: string };
+  up: { depth1: NeighborhoodNode[]; depth2: NeighborhoodNode[] };
+  down: { depth1: NeighborhoodNode[]; depth2: NeighborhoodNode[] };
+};
+
+const WHITELISTED_NEIGHBORHOOD_RELATIONS = new Set(["P279", "P31", "P361"]);
+
+function wikidataIdFromIri(iri: string): string {
+  return iri.split(/[/#]/).pop() ?? iri;
+}
+
+function dedupeNodes(
+  nodes: Array<{ iri: string; label?: string }>,
+  viaPropertyIri: string,
+  viaPropertyLabel: string
+): NeighborhoodNode[] {
+  const map = new Map<string, NeighborhoodNode>();
+  for (const n of nodes) {
+    if (!n.iri) continue;
+    if (map.has(n.iri)) continue;
+    map.set(n.iri, {
+      iri: n.iri,
+      label: n.label ?? wikidataIdFromIri(n.iri),
+      via: { propertyIri: viaPropertyIri, propertyLabel: viaPropertyLabel },
+    });
+  }
+  return Array.from(map.values());
+}
+
+/**
+ * Fetch a small 2-hop neighborhood around a Wikidata entity via a single
+ * relation predicate (e.g. `P279` subclass of).
+ *
+ * Semantics:
+ * - Up:    focus --Pxxx--> parent (2 hops follow the same direction)
+ * - Down:  child --Pxxx--> focus (2 hops follow the reverse direction)
+ */
+export async function fetchLiveRelationNeighborhood(params: {
+  focusIri: string;
+  relationCode: string;
+  depthLimit?: number;
+}): Promise<RelationNeighborhoodResponse> {
+  const { focusIri } = params;
+  const relationCode = params.relationCode.trim().toUpperCase();
+  const depthLimit = params.depthLimit ?? 25;
+
+  if (!/^https?:\/\/www\.wikidata\.org\/entity\/Q\d+$/i.test(focusIri)) {
+    throw new Error("Invalid `focusIri` (expected Wikidata entity IRI Q-id).");
+  }
+  if (!WHITELISTED_NEIGHBORHOOD_RELATIONS.has(relationCode)) {
+    throw new Error(
+      `Unsupported relation '${relationCode}'. Allowed: ${Array.from(WHITELISTED_NEIGHBORHOOD_RELATIONS).join(", ")}`
+    );
+  }
+
+  const relationPropertyIri = `http://www.wikidata.org/prop/direct/${relationCode}`;
+  const { resolvePredicateLabel } = await import("./wikidata-predicates");
+  const relationLabel = resolvePredicateLabel(relationPropertyIri);
+
+  const [focusRows, up1Rows, up2Rows, down1Rows, down2Rows] = await Promise.all([
+    runLiveSparql(
+      `
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+SELECT ?label ?description WHERE {
+  OPTIONAL { <${focusIri}> rdfs:label ?label . FILTER(LANG(?label) = "en") }
+  OPTIONAL { <${focusIri}> schema:description ?description . FILTER(LANG(?description) = "en") }
+}
+LIMIT 1
+`.trim(),
+      10_000
+    ),
+    runLiveSparql(
+      `
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?node ?label WHERE {
+  <${focusIri}> wdt:${relationCode} ?node .
+  FILTER(isIRI(?node))
+  OPTIONAL { ?node rdfs:label ?label . FILTER(LANG(?label) = "en") }
+}
+LIMIT ${depthLimit}
+`.trim(),
+      15_000
+    ),
+    runLiveSparql(
+      `
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?node ?label WHERE {
+  <${focusIri}> wdt:${relationCode} ?mid .
+  ?mid wdt:${relationCode} ?node .
+  FILTER(isIRI(?node))
+  OPTIONAL { ?node rdfs:label ?label . FILTER(LANG(?label) = "en") }
+}
+LIMIT ${depthLimit}
+`.trim(),
+      15_000
+    ),
+    runLiveSparql(
+      `
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?node ?label WHERE {
+  ?node wdt:${relationCode} <${focusIri}> .
+  FILTER(isIRI(?node))
+  OPTIONAL { ?node rdfs:label ?label . FILTER(LANG(?label) = "en") }
+}
+LIMIT ${depthLimit}
+`.trim(),
+      15_000
+    ),
+    runLiveSparql(
+      `
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?node ?label WHERE {
+  ?node wdt:${relationCode} ?mid .
+  ?mid wdt:${relationCode} <${focusIri}> .
+  FILTER(isIRI(?node))
+  OPTIONAL { ?node rdfs:label ?label . FILTER(LANG(?label) = "en") }
+}
+LIMIT ${depthLimit}
+`.trim(),
+      15_000
+    ),
+  ]);
+
+  const focusLabel = liveVal(focusRows[0] ?? {}, "label") ?? wikidataIdFromIri(focusIri);
+  const focusDescription = liveVal(focusRows[0] ?? {}, "description");
+
+  const mapRows = (rows: typeof up1Rows): NeighborhoodNode[] =>
+    dedupeNodes(
+      rows.map((b) => ({ iri: liveVal(b, "node") ?? "", label: liveVal(b, "label") })),
+      relationPropertyIri,
+      relationLabel
+    );
+
+  return {
+    focus: { iri: focusIri, label: focusLabel, description: focusDescription ?? undefined },
+    relation: { code: relationCode, label: relationLabel },
+    up: { depth1: mapRows(up1Rows), depth2: mapRows(up2Rows) },
+    down: { depth1: mapRows(down1Rows), depth2: mapRows(down2Rows) },
+  };
+}
